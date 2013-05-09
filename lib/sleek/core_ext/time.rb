@@ -1,0 +1,2 @@
+class Time
+end
