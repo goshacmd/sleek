@@ -15,6 +15,8 @@ module Sleek
       end
     end
 
+    attr_reader :interval, :timeframe
+
     # Internal: Initialize an interval.
     #
     # interval_desc - the Symbol description of the interval.
@@ -30,9 +32,9 @@ module Sleek
     #
     # Returns an Array of Timeframe objects.
     def timeframes
-      @timeframes ||= @timeframe.to_time_range.to_i_range.each_slice(@interval)
+      @timeframes ||= timeframe.to_time_range.to_i_range.each_slice(interval)
         .to_a[0..-2]
-        .map { |tf| (tf.first..(tf.first + @interval)).to_time_range }
+        .map { |tf| (tf.first..(tf.first + interval)).to_time_range }
         .map { |tf| Timeframe.new(tf) }
     end
   end

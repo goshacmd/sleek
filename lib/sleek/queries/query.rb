@@ -26,7 +26,26 @@ module Sleek
       def events(time_range = time_range)
         evts = Event.where(namespace: namespace, bucket: bucket)
         evts = evts.between("s.t" => time_range) if time_range
+        evts = apply_filters(evts) if filter?
         evts
+      end
+
+      # Internal: Apply all the filters to the criteria.
+      def apply_filters(criteria)
+        filters.inject(criteria) { |crit, filter| filter.apply(crit) }
+      end
+
+      # Internal: Get filters.
+      def filters
+        filters = options[:filter]
+        
+        if filters.is_a?(Array) && filters.size == 3 && filters.none? { |f| f.is_a?(Array) }
+          filters = [filters]
+        elsif !filters.is_a?(Array) || !filters.all? { |f| f.is_a?(Array) && f.size == 3 }
+          raise ArgumentError, "wrong filter - #{filters}"
+        end
+
+        filters.map { |f| Sleek::Filter.new(*f) }
       end
 
       # Internal: Get timeframe for the query.
@@ -43,6 +62,11 @@ module Sleek
 
       def series
         Sleek::Interval.new(options[:interval], timeframe).timeframes if series? && timeframe?
+      end
+
+      # Internal: Check if options include filter.
+      def filter?
+        options[:filter].present?
       end
 
       # Internal: Check if options include timeframe.
@@ -73,7 +97,8 @@ module Sleek
 
       # Internal: Validate the options.
       def valid_options?
-        options.is_a?(Hash) && (series? ? timeframe? && series : true)
+        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true) &&
+          (series? ? timeframe? && series : true)
       end
     end
   end

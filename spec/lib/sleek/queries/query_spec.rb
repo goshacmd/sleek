@@ -12,17 +12,17 @@ describe Sleek::Queries::Query do
     end
 
     context "when options are valid" do
-      it "does not raise ArgumerError" do
-        query_class.any_instance.stub(valid_options?: true)
+      before { query_class.any_instance.stub(valid_options?: true) }
 
+      it "does not raise ArgumerError" do
         expect { query_class.new(:d, :p) }.to_not raise_exception ArgumentError
       end
     end
 
     context "when options are invalid" do
-      it "raises ArgumentError" do
-        query_class.any_instance.stub(valid_options?: false)
+      before { query_class.any_instance.stub(valid_options?: false) }
 
+      it "raises ArgumentError" do
         expect { query_class.new(:d, :p) }.to raise_exception ArgumentError, "options are invalid"
       end
     end
@@ -30,9 +30,21 @@ describe Sleek::Queries::Query do
 
   describe "#events" do
     context "when no timeframe is specifies" do
-      it "returns events in current namespace and bucket" do
-        Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases)
-        query.events
+      context "when no filter is specified" do
+        it "returns events in current namespace and bucket" do
+          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases)
+          query.events
+        end
+      end
+
+      context "when filter is specified" do
+        before { query.stub(filter?: true) }
+
+        it "applies filters" do
+          final = stub('final_criteria')
+          query.should_receive(:apply_filters).and_return(final)
+          expect(query.events).to eq final
+        end
       end
     end
 
@@ -41,20 +53,79 @@ describe Sleek::Queries::Query do
       let(:finish) { Time.now }
       before { query.stub(:time_range).and_return(start..finish) }
 
-      it "gets only events between timeframe ends" do
-        pre_evts = stub('pre_events')
-        Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases).and_return(pre_evts)
-        pre_evts.should_receive(:between).with("s.t" => start..finish)
-        query.events
+      context "when no filter is specified" do
+        it "gets only events between timeframe ends" do
+          pre_evts = stub('pre_events')
+          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases).and_return(pre_evts)
+          pre_evts.should_receive(:between).with("s.t" => start..finish)
+          query.events
+        end
+      end
+
+      context "when filter is specified" do
+        before { query.stub(filter?: true) }
+
+        it "applies filters" do
+          pre_evts = stub('pre_events')
+          criteria = stub('criteria')
+          final = stub('final_criteria')
+          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases).and_return(pre_evts)
+          pre_evts.should_receive(:between).and_return(criteria)
+          query.should_receive(:apply_filters).with(criteria).and_return(final)
+          expect(query.events).to eq final
+        end
+      end
+    end
+  end
+
+  describe "#apply_filters" do
+    it "applies every filter to criteria" do
+      filters = [Sleek::Filter.new(:test, :gt, 1), Sleek::Filter.new(:test, :lt, 100)]
+      query.stub(filter?: true, filters: filters)
+      criteria = stub('criteria')
+      criteria2 = stub('criteria2')
+      final = stub('final_criteria')
+      criteria.should_receive(:gt).with("d.test" => 1).and_return(criteria2)
+      criteria2.should_receive(:lt).with("d.test" => 100).and_return(final)
+
+      expect(query.apply_filters(criteria)).to eq final
+    end
+  end
+
+  describe "#filters" do
+    context "when filters are specified" do
+      context "when proper single filter" do
+        before { query.stub(options: { filter: [:test, :gt, 1] }) }
+
+        it "returns an one-element array with Filter" do
+          expect(query.filters).to eq [Sleek::Filter.new(:test, :gt, 1)]
+        end
+      end
+
+      context "when proper multiple filters" do
+        before { query.stub(options: { filter: [[:test, :gt, 1], [:test, :lt, 100]] }) }
+
+        it "returns multiple-element array with Filters" do
+          expect(query.filters).to eq [Sleek::Filter.new(:test, :gt, 1), Sleek::Filter.new(:test, :lt, 100)]
+        end
+      end
+
+      context "when malformed filter" do
+        before { query.stub(options: { filter: :mwahaha }) }
+
+        it "raises an exception" do
+          expect { query.filters }.to raise_exception ArgumentError, "wrong filter - mwahaha"
+        end
       end
     end
   end
 
   describe "#timeframe" do
     context "when timeframe is specified" do
+      let(:tf) { stub('timeframe') }
+      before { query.stub(options: { timeframe: tf }) }
+
       it "creates new timeframe instance" do
-        tf = stub('timeframe')
-        query.stub(options: { timeframe: tf })
         Sleek::Timeframe.should_receive(:new).with(tf)
         query.timeframe
       end
@@ -63,11 +134,11 @@ describe Sleek::Queries::Query do
 
   describe "#series" do
     context "when timeframe and interval are specified" do
+      let(:tf) { stub('timeframe') }
+      before { query.stub(options: { timeframe: 'this_day', interval: :hourly }, timeframe: tf) }
+
       it "splits timeframe into intervals of sub-timeframes" do
-        tf_desc = stub('timeframe_desc')
-        tf = stub('timeframe')
         interval = stub('interval')
-        query.stub(options: { timeframe: tf_desc, interval: :hourly }, timeframe: tf)
         Sleek::Interval.should_receive(:new).with(:hourly, tf).and_return(interval)
         interval.should_receive(:timeframes)
         query.series
@@ -78,23 +149,25 @@ describe Sleek::Queries::Query do
   describe "#valid_options?" do
     context "when options is a hash" do
       context "when no interval is passed" do
+        before { query.stub(options: {}) }
+
         it "is true" do
-          query.stub(options: {})
           expect(query.valid_options?).to be_true
         end
       end
 
       context "when interval is passed" do
         context "when timeframe is passed" do
+          before { query.stub(options: { interval: :hourly, timeframe: Time.now.all_day }) }
+
           it "is true" do
-            query.stub(options: { interval: :hourly, timeframe: Time.now.all_day })
             expect(query.valid_options?).to be_true
           end
         end
 
         context "when timeframe is not passed" do
+          before { query.stub(options: { interval: :hourly }) }
           it "is false" do
-            query.stub(options: { interval: :hourly })
             expect(query.valid_options?).to be_false
           end
         end
@@ -102,8 +175,9 @@ describe Sleek::Queries::Query do
     end
 
     context "when options isn't a hash" do
+      before { query.stub(options: 1) }
+
       it "is false" do
-        query.stub(options: 1)
         expect(query.valid_options?).to be_false
       end
     end

@@ -200,6 +200,26 @@ sleek.queries.sum(:purchases, target_property: "total")
 # => 2_072_70
 ```
 
+## Filters
+
+To limit the scope of events used in analysis you can use a filter. To
+do so, you just pass the `:filter` option to the query.
+
+A single filter is a 3-element array, consisting of:
+
+* `property_name` - the property name to filter.
+* `operator` - the name of the operator to apply.
+* `value` - the value used in operator to compare to property value.
+
+Operators: eq, ne, lt, lte, gt, gte, in.
+
+You can pass either a single filter or an array of filters.
+
+```ruby
+sleek.queries.count(:purchases, filters: [:total, :gt, 1599])
+# => 20
+```
+
 ## Series
 
 Series allow you to analyze trends in metrics over time. They break a
