@@ -1,5 +1,7 @@
 ![Sleek](sleek.png)
 
+[![Build Status](https://travis-ci.org/goshakkk/sleek.png)](https://travis-ci.org/goshakkk/sleek)
+
 Sleek is a gem for doing analytics. It allows you to easily collect and
 analyze events that happen in your app.
 
