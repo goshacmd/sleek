@@ -27,6 +27,8 @@ module Sleek
 
     after_initialize { build_sleek }
 
+    index ns: 1, b: 1, "s.t" => 1
+
     def self.create_with_namespace(namespace, bucket, payload)
       sleek = payload.delete(:sleek)
       event = create(namespace: namespace, bucket: bucket, data: payload)

@@ -15,12 +15,18 @@ gem "sleek"
 
 Then, install it:
 
-```
+```bash
 $ bundle install
 ```
 
 Sleek requires MongoDB to work and assumes that you have Mongoid
 configured already.
+
+Finally, create needed indexes:
+
+```bash
+$ rake db:mongoid:create_indexes
+```
 
 ## Getting started
 
