@@ -235,6 +235,20 @@ Valid intervals are:
 * `:weekly`
 * `:monthly`
 
+## Other
+
+### Deleting buckets
+
+```ruby
+sleek.delete_bucket(:purchases)
+```
+
+### Deleting property from all events in the bucket
+
+```ruby
+sleek.delete_property(:purchases, :some_property)
+```
+
 ## License
 
 [MIT](LICENSE).

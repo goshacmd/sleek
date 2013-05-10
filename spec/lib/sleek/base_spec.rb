@@ -27,4 +27,22 @@ describe Sleek::Base do
       expect(qc.namespace).to eq :default
     end
   end
+
+  describe "#delete_bucket" do
+    it "deletes everything from the bucket" do
+      events = stub('events')
+      sleek.should_receive(:events).with(:abc).and_return(events)
+      events.should_receive(:delete_all)
+      sleek.delete_bucket(:abc)
+    end
+  end
+
+  describe "#delete_property" do
+    it "it deletes the property from all events in bucket" do
+      events = stub('events')
+      sleek.should_receive(:events).with(:abc).and_return(events)
+      events.should_receive(:unset).with("d.test")
+      sleek.delete_property(:abc, "test")
+    end
+  end
 end
