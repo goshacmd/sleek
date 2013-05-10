@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Sleek::Base do
-  subject(:sleek) { Sleek::Base.new(:default) }
+describe Sleek::Namespace do
+  subject(:sleek) { Sleek::Namespace.new(:default) }
 
   describe "#initialize" do
     it "sets the namespace" do
-      sleek = Sleek::Base.new(:my_namespace)
+      sleek = Sleek::Namespace.new(:my_namespace)
       expect(sleek.namespace).to eq :my_namespace
     end
   end
@@ -28,7 +28,7 @@ describe Sleek::Base do
     end
   end
 
-  describe "#delete_namespace!" do
+  describe "#delete!" do
     it "deletes everything from the namespace" do
       events = stub('events')
       sleek.should_receive(:events).and_return(events)

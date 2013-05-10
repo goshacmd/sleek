@@ -10,11 +10,11 @@ require 'sleek/filter'
 require 'sleek/event'
 require 'sleek/queries'
 require 'sleek/query_collection'
-require 'sleek/base'
+require 'sleek/namespace'
 
 module Sleek
   def self.for_namespace(namespace)
-    Base.new namespace
+    Namespace.new namespace
   end
 
   def self.[](namespace)

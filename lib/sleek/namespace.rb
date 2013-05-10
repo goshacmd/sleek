@@ -1,12 +1,12 @@
 module Sleek
-  class Base
-    attr_reader :namespace
+  class Namespace
+    attr_reader :name
 
     # Internal: Initialize Sleek with namespace.
     #
     # namespace - the Symbol namespace name.
-    def initialize(namespace)
-      @namespace = namespace
+    def initialize(name)
+      @name = name
     end
 
     # Public: Record an event.
@@ -14,16 +14,16 @@ module Sleek
     # bucket  - the String name of bucket.
     # payload - the Hash of event data.
     def record(bucket, payload)
-      Event.create_with_namespace(namespace, bucket, payload)
+      Event.create_with_namespace(name, bucket, payload)
     end
 
     # Public: Get `QueriesCollection` for the namespace.
     def queries
-      @queries ||= QueryCollection.new(namespace)
+      @queries ||= QueryCollection.new(name)
     end
 
     # Public: Delete the namespace.
-    def delete_namespace!
+    def delete!
       events.delete_all
     end
 
@@ -45,13 +45,13 @@ module Sleek
     # Internal: Get events associated with current namespace and,
     # optionally, specified bucket.
     def events(bucket = nil)
-      evts = Event.where(namespace: namespace)
+      evts = Event.where(namespace: name)
       evts = evts.where(bucket: bucket) if bucket.present?
       evts
     end
 
     def inspect
-      "#<Sleek::Base ns=#{namespace}>"
+      "#<Sleek::Namespace #{name}>"
     end
   end
 end
