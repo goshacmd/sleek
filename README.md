@@ -245,6 +245,12 @@ Valid intervals are:
 
 ## Other
 
+### Deleting namespace
+
+```ruby
+sleek.delete_namespace!
+```
+
 ### Deleting buckets
 
 ```ruby

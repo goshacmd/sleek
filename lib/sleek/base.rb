@@ -22,6 +22,11 @@ module Sleek
       @queries ||= QueryCollection.new(namespace)
     end
 
+    # Public: Delete the namespace.
+    def delete_namespace!
+      events.delete_all
+    end
+
     # Public: Delete event bucket.
     #
     # bucket - the String bucket name.

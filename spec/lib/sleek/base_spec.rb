@@ -28,6 +28,15 @@ describe Sleek::Base do
     end
   end
 
+  describe "#delete_namespace!" do
+    it "deletes everything from the namespace" do
+      events = stub('events')
+      sleek.should_receive(:events).and_return(events)
+      events.should_receive(:delete_all)
+      sleek.delete_namespace!
+    end
+  end
+
   describe "#delete_bucket" do
     it "deletes everything from the bucket" do
       events = stub('events')
