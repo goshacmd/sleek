@@ -30,7 +30,7 @@ data inside a single application. In Sleek, everything is namespaced.
 Creating a namespaced instance of Sleek is easy:
 
 ```ruby
-sleek = Sleek.for_namespace :my_namespace
+sleek = Sleek[:my_namespace]
 ```
 
 You then would just call everything on this instance.

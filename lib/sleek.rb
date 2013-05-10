@@ -15,4 +15,8 @@ module Sleek
   def self.for_namespace(namespace)
     Base.new namespace
   end
+
+  def self.[](namespace)
+    for_namespace(namespace)
+  end
 end
