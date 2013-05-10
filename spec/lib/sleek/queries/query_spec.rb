@@ -61,13 +61,92 @@ describe Sleek::Queries::Query do
     end
   end
 
+  describe "#series" do
+    context "when timeframe and interval are specified" do
+      it "splits timeframe into intervals of sub-timeframes" do
+        tf_desc = stub('timeframe_desc')
+        tf = stub('timeframe')
+        interval = stub('interval')
+        query.stub(options: { timeframe: tf_desc, interval: :hourly }, timeframe: tf)
+        Sleek::Interval.should_receive(:new).with(:hourly, tf).and_return(interval)
+        interval.should_receive(:timeframes)
+        query.series
+      end
+    end
+  end
+
+  describe "#valid_options?" do
+    context "when options is a hash" do
+      context "when no interval is passed" do
+        it "is true" do
+          query.stub(options: {})
+          expect(query.valid_options?).to be_true
+        end
+      end
+
+      context "when interval is passed" do
+        context "when timeframe is passed" do
+          it "is true" do
+            query.stub(options: { interval: :hourly, timeframe: Time.now.all_day })
+            expect(query.valid_options?).to be_true
+          end
+        end
+
+        context "when timeframe is not passed" do
+          it "is false" do
+            query.stub(options: { interval: :hourly })
+            expect(query.valid_options?).to be_false
+          end
+        end
+      end
+    end
+
+    context "when options isn't a hash" do
+      it "is false" do
+        query.stub(options: 1)
+        expect(query.valid_options?).to be_false
+      end
+    end
+  end
+
   describe "#run" do
-    it "performs query on events" do
-      events = stub
-      result = stub
-      query.should_receive(:perform).with(events).and_return(result)
-      query.stub(events: events)
-      query.run
+    context "when no series were requested" do
+      it "performs query on events" do
+        events = stub
+        result = stub
+        query.should_receive(:perform).with(events).and_return(result)
+        query.stub(events: events)
+        query.run
+      end
+    end
+
+    context "when series were requested" do
+      let(:series) { (0..23).to_a.map { |i| stub(to_time_range: (i..(i+1))) } }
+      before { query.stub(options: { timeframe: 'this_day', interval: :hourly }, series: series) }
+
+      it "performs query on each of sub-timeframes" do
+        24.times do |i|
+          evts = stub('events')
+          query.should_receive(:events).with(i..(i+1)).and_return(evts)
+          query.should_receive(:perform).with(evts)
+        end
+
+        query.run
+      end
+
+      it "returns the array of results" do
+        results = []
+
+        24.times do |i|
+          evts = stub('events')
+          value = stub('value')
+          results << { timeframe: series[i], value: value }
+          query.should_receive(:events).with(i..(i+1)).and_return(evts)
+          query.should_receive(:perform).with(evts).and_return(value)
+        end
+
+        expect(query.run).to eq results
+      end
     end
   end
 end

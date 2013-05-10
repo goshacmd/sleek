@@ -80,7 +80,18 @@ You can limit the scope of events that analysis is run on by adding the
 `:timeframe` option to any query call.
 
 ```ruby
-sleek.query(:purchases, timeframe: :this_day)
+sleek.queries.count(:purchases, timeframe: :this_day)
+```
+
+#### Query with interval
+
+Some kinds of applications may need to analyze trends in the data. Using
+intervals, you can break a timeframe into minutes, hours, days, weeks,
+or months. One can do so by passing the `:interval` option to any query
+call. Using `:interval` also requires that you specify `:timeframe`.
+
+```ruby
+sleek.queries.count(:purchases, timeframe: :this_day, interval: :hourly)
 ```
 
 ## Data analysis in more detail
@@ -175,6 +186,21 @@ You must pass the target property name in params like this:
 ```ruby
 sleek.queries.sum(:purchases, target_property: "total")
 ```
+
+## Series
+
+Series allow you to analyze trends in metrics over time. They break a
+timeframe into intervals and compute the metric for those intervals.
+
+Calculating series is simply done by adding the `:timeframe` and
+`:interval` options to the metric query.
+
+Valid intervals are:
+
+* `:hourly`
+* `:daily`
+* `:weekly`
+* `:monthly`
 
 ## License
 

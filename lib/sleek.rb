@@ -5,6 +5,7 @@ require 'sleek/core_ext/time'
 
 require 'sleek/version'
 require 'sleek/timeframe'
+require 'sleek/interval'
 require 'sleek/event'
 require 'sleek/queries'
 require 'sleek/query_collection'

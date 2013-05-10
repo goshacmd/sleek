@@ -47,7 +47,7 @@ module Sleek
         when Array
           t = timeframe.first..timeframe.last if timeframe.size == 2 && timeframe.count { |tf| tf.is_a?(Time) } == 2
         when String, Symbol
-          t = process(timeframe.to_s)
+          t = parse(timeframe.to_s)
         end
 
         raise ArgumentError, "wrong timeframe" unless t
