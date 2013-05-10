@@ -6,7 +6,7 @@ describe Sleek::Namespace do
   describe "#initialize" do
     it "sets the namespace" do
       sleek = Sleek::Namespace.new(:my_namespace)
-      expect(sleek.namespace).to eq :my_namespace
+      expect(sleek.name).to eq :my_namespace
     end
   end
 
@@ -33,7 +33,7 @@ describe Sleek::Namespace do
       events = stub('events')
       sleek.should_receive(:events).and_return(events)
       events.should_receive(:delete_all)
-      sleek.delete_namespace!
+      sleek.delete!
     end
   end
 
