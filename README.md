@@ -5,12 +5,20 @@
 Sleek is a gem for doing analytics. It allows you to easily collect and
 analyze events that happen in your app.
 
+**Sleek is a work-in-progress development. Use with caution.**
+
 ## Installation
 
 The easiest way to install Sleek is to add it to your Gemfile:
 
 ```ruby
 gem "sleek"
+```
+
+Or, if you want the latest hotness:
+
+```ruby
+gem "sleek", github: "goshakkk/sleek"
 ```
 
 Then, install it:
