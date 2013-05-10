@@ -17,5 +17,9 @@ module Sleek
         klass.new(namespace, bucket, options).run
       end
     end
+
+    def inspect
+      "#<Sleek::QueryCollection ns=#{namespace}>"
+    end
   end
 end

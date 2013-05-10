@@ -32,6 +32,10 @@ module Sleek
       @range ||= self.class.to_range(@timeframe)
     end
 
+    def inspect
+      "#<Sleek::Timeframe #{to_time_range}>"
+    end
+
     class << self
       # Internal: Transform the object passed to Timeframe initializer
       # into a range of Time objects.

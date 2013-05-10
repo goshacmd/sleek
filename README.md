@@ -63,6 +63,7 @@ occurred.
 
 ```ruby
 sleek.queries.count(:purchases)
+# => 42
 ```
 
 #### Average
@@ -71,7 +72,8 @@ In order to calculate average value, it's needed to additionally specify
 what property should the average be calculated based on:
 
 ```ruby
-sleek.queries.average(:purchases, target_property: :total) # => 1999
+sleek.queries.average(:purchases, target_property: :total)
+# => 1999
 ```
 
 #### Query with timeframe
@@ -81,6 +83,7 @@ You can limit the scope of events that analysis is run on by adding the
 
 ```ruby
 sleek.queries.count(:purchases, timeframe: :this_day)
+# => 10
 ```
 
 #### Query with interval
@@ -91,7 +94,11 @@ or months. One can do so by passing the `:interval` option to any query
 call. Using `:interval` also requires that you specify `:timeframe`.
 
 ```ruby
-sleek.queries.count(:purchases, timeframe: :this_day, interval: :hourly)
+sleek.queries.count(:purchases, timeframe: :this_2_days, interval: :daily)
+# => [
+#      {:timeframe=>#<Sleek::Timeframe 2013-01-01 00:00:00 UTC..2013-01-02 00:00:00 UTC>, :value=>10},
+#      {:timeframe=>#<Sleek::Timeframe 2013-01-02 00:00:00 UTC..2013-01-03 00:00:00 UTC>, :value=>24}
+#    ]
 ```
 
 ## Data analysis in more detail
@@ -107,6 +114,7 @@ Count just counts the number of events recorded.
 
 ```ruby
 sleek.queries.count(:bucket)
+# => 42
 ```
 
 ### Count unique
@@ -121,6 +129,7 @@ You must pass the target property name in params like this:
 
 ```ruby
 sleek.queries.count_unique(:purchases, target_property: "customer.id")
+# => 30
 ```
 
 ### Minimum
@@ -137,6 +146,7 @@ You must pass the target property name in params like this:
 
 ```ruby
 sleek.queries.minimum(:purchases, target_property: "total")
+# => 10_99
 ```
 
 ### Maximum
@@ -153,6 +163,7 @@ You must pass the target property name in params like this:
 
 ```ruby
 sleek.queries.maximum(:purchases, target_property: "total")
+# => 199_99
 ```
 
 ### Average
@@ -169,6 +180,7 @@ You must pass the target property name in params like this:
 
 ```ruby
 sleek.queries.average(:purchases, target_property: "total")
+# => 49_35
 ```
 
 ### Sum
@@ -185,6 +197,7 @@ You must pass the target property name in params like this:
 
 ```ruby
 sleek.queries.sum(:purchases, target_property: "total")
+# => 2_072_70
 ```
 
 ## Series

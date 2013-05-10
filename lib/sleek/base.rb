@@ -21,5 +21,9 @@ module Sleek
     def queries
       @queries ||= QueryCollection.new(namespace)
     end
+
+    def inspect
+      "#<Sleek::Base ns=#{namespace}>"
+    end
   end
 end
