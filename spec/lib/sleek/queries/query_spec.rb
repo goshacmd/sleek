@@ -29,6 +29,28 @@ describe Sleek::Queries::Query do
   end
 
   describe "#events" do
+    context "when group_by is specified" do
+      let(:evts) { stub('events') }
+      before { query.stub(options: { group_by: "group" }) }
+
+      it "creates a group_by criteria from Mongoid::Criteria" do
+        Sleek::Event.should_receive(:where).and_return(evts)
+        Sleek::GroupByCriteria.should_receive(:new).with(evts, "d.group")
+
+        query.events
+      end
+
+      it "returns a group_by criteria" do
+        Sleek::Event.stub(where: evts)
+
+        crit = query.events
+
+        expect(crit.class).to eq Sleek::GroupByCriteria
+        expect(crit.criteria).to eq evts
+        expect(crit.group_by).to eq "d.group"
+      end
+    end
+
     context "when no timeframe is specifies" do
       context "when no filter is specified" do
         it "returns events in current namespace and bucket" do

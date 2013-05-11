@@ -27,6 +27,7 @@ module Sleek
         evts = Event.where(namespace: namespace, bucket: bucket)
         evts = evts.between("s.t" => time_range) if time_range
         evts = apply_filters(evts) if filter?
+        evts = Sleek::GroupByCriteria.new(evts, "d.#{group_by}") if group_by.present?
         evts
       end
 
@@ -77,6 +78,11 @@ module Sleek
       # Internal: Check if options include interval.
       def series?
         options[:interval].present?
+      end
+
+      # Internal: Get group_by property.
+      def group_by
+        options[:group_by]
       end
 
       # Internal: Run the query.

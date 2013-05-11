@@ -151,8 +151,8 @@ sleek.queries.count_unique(:purchases, target_property: "customer.id")
 ### Minimum
 
 It finds the minimum numeric value for a given property. All non-numeric
-values are ignored. If none of property values are numeric, the
-exception will be raised.
+values are ignored. If none of property values are numeric, nil will
+be returned.
 
 ```ruby
 sleek.queries.minimum(:bucket, params)
@@ -168,8 +168,8 @@ sleek.queries.minimum(:purchases, target_property: "total")
 ### Maximum
 
 It finds the maximum numeric value for a given property. All non-numeric
-values are ignored. If none of property values are numeric, the
-exception will be raised.
+values are ignored. If none of property values are numeric, nill will
+be returned.
 
 ```ruby
 sleek.queries.maximum(:bucket, params)
@@ -186,7 +186,7 @@ sleek.queries.maximum(:purchases, target_property: "total")
 
 The average query finds the average value for a given property.  All
 non-numeric values are ignored. If none of property values are numeric,
-the exception will be raised.
+nil will be returned.
 
 ```ruby
 sleek.queries.average(:bucket, params)
@@ -203,7 +203,7 @@ sleek.queries.average(:purchases, target_property: "total")
 
 The sum query sums all the numeric values for a given property. All
 non-numeric values are ignored. If none of property values are numeric,
-the exception will be raised.
+nil will be returned.
 
 ```ruby
 sleek.queries.sum(:bucket, params)
@@ -250,6 +250,39 @@ Valid intervals are:
 * `:daily`
 * `:weekly`
 * `:monthly`
+
+## Group by
+
+In addition to using metrics and series, it is sometimes desired to
+group their outputs by a specific property value.
+
+For example, you might be wondering, "How much have me made from each of
+our customers?" Group by will help you answer questions like this.
+
+To group metrics or series result by value of some property, all you
+need to do is to pass the `:group_by` option to the query.
+
+```ruby
+sleek.queries.sum(:purchases, target_property: "total", group_by: "customer.email")
+# => {"first@another.com"=>214998, "first@last.com"=>64999}
+```
+
+Or, you may wonder how much did you make from each of your customers for
+every day of this week.
+
+```ruby
+sleek.queries.sum(:purchases, target_property: "total", timeframe: :this_week,
+  interval: :daily, group_by: "customer.email")
+```
+
+You can even combine it with filters. For example, how much did you make
+from each of your customers for evey day of this weeks on orders greater
+than $1000?
+
+```ruby
+sleek.queries.sum(:purchases, target_property: "total", filter: ["total", :gte, 1000_00],
+  timeframe: :this_week, interval: :daily, group_by: "customer.email")
+```
 
 ## Other
 
