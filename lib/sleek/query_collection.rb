@@ -4,7 +4,7 @@ module Sleek
 
     # Inernal: Initialize query collection.
     #
-    # namespace - the Symbol namespace name.
+    # namespace - the Sleek::Namespace object.
     def initialize(namespace)
       @namespace = namespace
     end
@@ -19,7 +19,7 @@ module Sleek
     end
 
     def inspect
-      "#<Sleek::QueryCollection ns=#{namespace}>"
+      "#<Sleek::QueryCollection ns=#{namespace.name}>"
     end
   end
 end

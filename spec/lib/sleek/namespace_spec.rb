@@ -22,9 +22,9 @@ describe Sleek::Namespace do
 
   describe "#queries" do
     it "returns QueryCollection for current namespace" do
-      Sleek::QueryCollection.should_receive(:new).with(:default).and_call_original
+      Sleek::QueryCollection.should_receive(:new).with(sleek).and_call_original
       qc = sleek.queries
-      expect(qc.namespace).to eq :default
+      expect(qc.namespace).to eq sleek
     end
   end
 

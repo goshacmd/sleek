@@ -1,18 +1,21 @@
 require 'spec_helper'
 
 describe Sleek::QueryCollection do
-  subject(:collection) { Sleek::QueryCollection.new(:default) }
+  let(:namespace) { stub('namespace', name: :default) }
+  subject(:collection) { Sleek::QueryCollection.new(namespace) }
 
   describe "#initialize" do
     it "sets the namespace" do
-      collection = Sleek::QueryCollection.new(:my_namespace)
-      expect(collection.namespace).to eq :my_namespace
+      my_namespace = stub('my_namespace', name: :my_namespace)
+      collection = Sleek::QueryCollection.new(my_namespace)
+      expect(collection.namespace).to eq my_namespace
     end
   end
 
   describe "query methods" do
     it "creates query class and passes options" do
-      Sleek::Queries::Count.should_receive(:new).with(:default, :purchases, { some: :opts }).and_call_original
+      query = stub('query', run: nil)
+      Sleek::Queries::Count.should_receive(:new).with(namespace, :purchases, { some: :opts }).and_return(query)
       collection.count(:purchases, { some: :opts })
     end
 

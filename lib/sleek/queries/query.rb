@@ -5,7 +5,7 @@ module Sleek
 
       # Internal: Initialize the query.
       #
-      # namespace - the Symbol namespace name.
+      # namespace - the Sleek::Namespace object.
       # bucket    - the String bucket name.
       # options   - the optional Hash of options.
       #             :timeframe - the optional timeframe description.
@@ -24,7 +24,7 @@ module Sleek
       #
       # time_range - the optional range of Time objects.
       def events(time_range = time_range)
-        evts = Event.where(namespace: namespace, bucket: bucket)
+        evts = namespace.events(bucket)
         evts = evts.between("s.t" => time_range) if time_range
         evts = apply_filters(evts) if filter?
         evts = Sleek::GroupByCriteria.new(evts, "d.#{group_by}") if group_by.present?

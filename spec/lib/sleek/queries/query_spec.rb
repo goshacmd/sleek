@@ -2,12 +2,14 @@ require 'spec_helper'
 
 describe Sleek::Queries::Query do
   let(:query_class) { Sleek::Queries::Query }
-  subject(:query) { query_class.new(:default, :purchases) }
+  let(:namespace) { stub('namespace', name: :default) }
+  subject(:query) { query_class.new(namespace, :purchases) }
 
   describe "#initialize" do
     it "sets the namespace and bucket" do
-      query = Sleek::Queries::Query.new(:my_namespace, :purchases)
-      expect(query.namespace).to eq :my_namespace
+      my_namespace = stub('my_namespace', name: :my_namespace)
+      query = Sleek::Queries::Query.new(my_namespace, :purchases)
+      expect(query.namespace).to eq my_namespace
       expect(query.bucket).to eq :purchases
     end
 
@@ -29,19 +31,20 @@ describe Sleek::Queries::Query do
   end
 
   describe "#events" do
+    let(:evts) { stub('events') }
+
     context "when group_by is specified" do
-      let(:evts) { stub('events') }
       before { query.stub(options: { group_by: "group" }) }
 
       it "creates a group_by criteria from Mongoid::Criteria" do
-        Sleek::Event.should_receive(:where).and_return(evts)
+        namespace.should_receive(:events).and_return(evts)
         Sleek::GroupByCriteria.should_receive(:new).with(evts, "d.group")
 
         query.events
       end
 
       it "returns a group_by criteria" do
-        Sleek::Event.stub(where: evts)
+        namespace.stub(events: evts)
 
         crit = query.events
 
@@ -54,7 +57,8 @@ describe Sleek::Queries::Query do
     context "when no timeframe is specifies" do
       context "when no filter is specified" do
         it "returns events in current namespace and bucket" do
-          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases)
+          namespace.stub(events: evts)
+          namespace.should_receive(:events).with(:purchases)
           query.events
         end
       end
@@ -64,6 +68,7 @@ describe Sleek::Queries::Query do
 
         it "applies filters" do
           final = stub('final_criteria')
+          namespace.stub(events: evts)
           query.should_receive(:apply_filters).and_return(final)
           expect(query.events).to eq final
         end
@@ -78,7 +83,7 @@ describe Sleek::Queries::Query do
       context "when no filter is specified" do
         it "gets only events between timeframe ends" do
           pre_evts = stub('pre_events')
-          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases).and_return(pre_evts)
+          namespace.should_receive(:events).with(:purchases).and_return(pre_evts)
           pre_evts.should_receive(:between).with("s.t" => start..finish)
           query.events
         end
@@ -91,7 +96,7 @@ describe Sleek::Queries::Query do
           pre_evts = stub('pre_events')
           criteria = stub('criteria')
           final = stub('final_criteria')
-          Sleek::Event.should_receive(:where).with(namespace: :default, bucket: :purchases).and_return(pre_evts)
+          namespace.should_receive(:events).with(:purchases).and_return(pre_evts)
           pre_evts.should_receive(:between).and_return(criteria)
           query.should_receive(:apply_filters).with(criteria).and_return(final)
           expect(query.events).to eq final

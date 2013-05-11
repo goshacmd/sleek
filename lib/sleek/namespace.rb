@@ -19,7 +19,7 @@ module Sleek
 
     # Public: Get `QueriesCollection` for the namespace.
     def queries
-      @queries ||= QueryCollection.new(name)
+      @queries ||= QueryCollection.new(self)
     end
 
     # Public: Delete the namespace.
