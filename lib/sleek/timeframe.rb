@@ -1,5 +1,7 @@
 module Sleek
   class Timeframe
+    REGEXP = /(this|previous)_((\d+)_)?(minute|hour|day|week|month)s?/
+
     class << self
       # Internal: Transform the object passed to Timeframe initializer
       # into a range of Time objects.
@@ -16,16 +18,15 @@ module Sleek
       # Raises ArgumentError if passed object can't be processed.
       def to_range(timeframe)
         case timeframe
-        when Range
-          t = timeframe if timeframe.time_range?
-        when Array
-          t = timeframe.first..timeframe.last if timeframe.size == 2 && timeframe.count { |tf| tf.is_a?(Time) } == 2
+        when proc { |tf| tf.is_a?(Range) && tf.time_range? }
+          t = timeframe
+        when proc { |tf| tf.is_a?(Array) && tf.size == 2 && tf.count { |_tf| _tf.is_a?(Time) } == 2 }
+          t = timeframe.first..timeframe.last
         when String, Symbol
           t = parse(timeframe.to_s)
+        else
+          raise ArgumentError, "wrong timeframe - #{timeframe}"
         end
-
-        raise ArgumentError, "wrong timeframe" unless t
-        t
       end
 
       # Internal: Process timeframe string to make up a range.
@@ -33,8 +34,7 @@ module Sleek
       # timeframe - the String matching
       #             (this|previous)_((\d+)_)?(minute|hour|day|week|month)s?
       def parse(timeframe)
-        regexp = /(this|previous)_((\d+)_)?(minute|hour|day|week|month)s?/
-        _, category, _, number, interval = *timeframe.match(regexp)
+        _, category, _, number, interval = *timeframe.match(REGEXP)
 
         unless category && interval
           raise ArgumentError, "special timeframe string is malformed"

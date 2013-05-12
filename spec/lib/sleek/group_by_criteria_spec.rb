@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Sleek::GroupByCriteria do
-  let(:collection) { stub('collection', aggregate: []) }
-  let(:criteria) { stub('criteria', collection: collection) }
+  let(:collection) { mock('collection', aggregate: []) }
+  let(:criteria) { mock('criteria', collection: collection) }
   let(:group_by) { "d.field" }
   let(:db_group) { "$d.field" }
   subject(:crit) { Sleek::GroupByCriteria.new(criteria, group_by) }
@@ -15,9 +15,9 @@ describe Sleek::GroupByCriteria do
     end
 
     it "aggregates on the collection" do
-      pipeline = stub('pipeline')
-      result_a = stub('result_a')
-      result = stub('result', to_a: result_a)
+      pipeline = double('pipeline')
+      result_a = double('result_a')
+      result = double('result', to_a: result_a)
       crit.stub(:aggregates_pipeline).and_return(pipeline)
       collection.should_receive(:aggregate).with(pipeline).and_return(result)
 

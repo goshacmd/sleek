@@ -13,9 +13,7 @@ describe Sleek::Namespace do
   describe "#record" do
     it "creates an event record" do
       data = { name: 'John Doe', email: 'j@d.com' }
-
       Sleek::Event.should_receive(:create_with_namespace).with(:default, "signups", data)
-
       sleek.record("signups", data)
     end
   end

@@ -42,6 +42,12 @@ describe Sleek::Timeframe do
         expect(Sleek::Timeframe.to_range('this_day')).to eq range
       end
     end
+
+    context "when passed something else" do
+      it "raises an exception" do
+        expect { Sleek::Timeframe.to_range(some_object: 1) }.to raise_exception ArgumentError
+      end
+    end
   end
 
   describe ".parse" do

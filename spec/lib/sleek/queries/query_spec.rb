@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe Sleek::Queries::Query do
   let(:query_class) { Sleek::Queries::Query }
-  let(:namespace) { stub('namespace', name: :default) }
+  let(:namespace) { mock('namespace', name: :default) }
   subject(:query) { query_class.new(namespace, :purchases) }
 
   describe "#initialize" do
     it "sets the namespace and bucket" do
-      my_namespace = stub('my_namespace', name: :my_namespace)
+      my_namespace = double('my_namespace', name: :my_namespace)
       query = Sleek::Queries::Query.new(my_namespace, :purchases)
       expect(query.namespace).to eq my_namespace
       expect(query.bucket).to eq :purchases
@@ -31,7 +31,7 @@ describe Sleek::Queries::Query do
   end
 
   describe "#events" do
-    let(:evts) { stub('events') }
+    let(:evts) { double('events') }
 
     context "when group_by is specified" do
       before { query.stub(options: { group_by: "group" }) }
@@ -167,8 +167,8 @@ describe Sleek::Queries::Query do
 
   describe "#run" do
     it "performs query on events" do
-      events = stub
-      result = stub
+      events = double('events')
+      result = double('result')
       query.should_receive(:perform).with(events).and_return(result)
       query.stub(events: events)
       query.run
