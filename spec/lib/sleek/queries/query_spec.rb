@@ -78,7 +78,7 @@ describe Sleek::Queries::Query do
     context "when timeframe is specified" do
       let(:start) { 1.day.ago }
       let(:finish) { Time.now }
-      before { query.stub(:time_range).and_return(start..finish) }
+      before { query.stub(:timeframe).and_return(start..finish) }
 
       context "when no filter is specified" do
         it "gets only events between timeframe ends" do
@@ -147,57 +147,12 @@ describe Sleek::Queries::Query do
     end
   end
 
-  describe "#timeframe" do
-    context "when timeframe is specified" do
-      let(:tf) { stub('timeframe') }
-      before { query.stub(options: { timeframe: tf }) }
-
-      it "creates new timeframe instance" do
-        Sleek::Timeframe.should_receive(:new).with(tf)
-        query.timeframe
-      end
-    end
-  end
-
-  describe "#series" do
-    context "when timeframe and interval are specified" do
-      let(:tf) { stub('timeframe') }
-      before { query.stub(options: { timeframe: 'this_day', interval: :hourly }, timeframe: tf) }
-
-      it "splits timeframe into intervals of sub-timeframes" do
-        interval = stub('interval')
-        Sleek::Interval.should_receive(:new).with(:hourly, tf).and_return(interval)
-        interval.should_receive(:timeframes)
-        query.series
-      end
-    end
-  end
-
   describe "#valid_options?" do
     context "when options is a hash" do
-      context "when no interval is passed" do
-        before { query.stub(options: {}) }
+      before { query.stub(options: {}) }
 
-        it "is true" do
-          expect(query.valid_options?).to be_true
-        end
-      end
-
-      context "when interval is passed" do
-        context "when timeframe is passed" do
-          before { query.stub(options: { interval: :hourly, timeframe: Time.now.all_day }) }
-
-          it "is true" do
-            expect(query.valid_options?).to be_true
-          end
-        end
-
-        context "when timeframe is not passed" do
-          before { query.stub(options: { interval: :hourly }) }
-          it "is false" do
-            expect(query.valid_options?).to be_false
-          end
-        end
+      it "is true" do
+        expect(query.valid_options?).to be_true
       end
     end
 
@@ -211,43 +166,12 @@ describe Sleek::Queries::Query do
   end
 
   describe "#run" do
-    context "when no series were requested" do
-      it "performs query on events" do
-        events = stub
-        result = stub
-        query.should_receive(:perform).with(events).and_return(result)
-        query.stub(events: events)
-        query.run
-      end
-    end
-
-    context "when series were requested" do
-      let(:series) { (0..23).to_a.map { |i| stub(to_time_range: (i..(i+1))) } }
-      before { query.stub(options: { timeframe: 'this_day', interval: :hourly }, series: series) }
-
-      it "performs query on each of sub-timeframes" do
-        24.times do |i|
-          evts = stub('events')
-          query.should_receive(:events).with(i..(i+1)).and_return(evts)
-          query.should_receive(:perform).with(evts)
-        end
-
-        query.run
-      end
-
-      it "returns the array of results" do
-        results = []
-
-        24.times do |i|
-          evts = stub('events')
-          value = stub('value')
-          results << { timeframe: series[i], value: value }
-          query.should_receive(:events).with(i..(i+1)).and_return(evts)
-          query.should_receive(:perform).with(evts).and_return(value)
-        end
-
-        expect(query.run).to eq results
-      end
+    it "performs query on events" do
+      events = stub
+      result = stub
+      query.should_receive(:perform).with(events).and_return(result)
+      query.stub(events: events)
+      query.run
     end
   end
 end

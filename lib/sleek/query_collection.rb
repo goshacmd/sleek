@@ -14,7 +14,7 @@ module Sleek
       klass = "Sleek::Queries::#{name.to_s.camelize}".constantize
 
       define_method(name) do |bucket, options = {}|
-        klass.new(namespace, bucket, options).run
+        QueryCommand.new(klass, namespace, bucket, options).run
       end
     end
 

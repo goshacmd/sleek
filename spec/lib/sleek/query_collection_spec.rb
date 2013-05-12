@@ -13,16 +13,15 @@ describe Sleek::QueryCollection do
   end
 
   describe "query methods" do
-    it "creates query class and passes options" do
-      query = stub('query', run: nil)
-      Sleek::Queries::Count.should_receive(:new).with(namespace, :purchases, { some: :opts }).and_return(query)
+    it "creates query command" do
+      Sleek::QueryCommand.should_receive(:new).with(Sleek::Queries::Count, namespace, :purchases, { some: :opts }).and_return(stub.as_null_object)
       collection.count(:purchases, { some: :opts })
     end
 
-    it "runs the query" do
-      count = stub('count_query')
-      Sleek::Queries::Count.should_receive(:new).and_return(count)
-      count.should_receive(:run)
+    it "runs the query command" do
+      query_command = stub('query_command')
+      Sleek::QueryCommand.should_receive(:new).and_return(query_command)
+      query_command.should_receive(:run)
 
       collection.count(:purchases)
     end

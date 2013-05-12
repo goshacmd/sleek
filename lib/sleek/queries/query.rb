@@ -1,7 +1,7 @@
 module Sleek
   module Queries
     class Query
-      attr_reader :namespace, :bucket, :options
+      attr_reader :namespace, :bucket, :options, :timeframe
 
       # Internal: Initialize the query.
       #
@@ -16,6 +16,7 @@ module Sleek
         @namespace = namespace
         @bucket = bucket
         @options = options
+        @timeframe = options[:timeframe]
 
         raise ArgumentError, "options are invalid" unless valid_options?
       end
@@ -23,9 +24,9 @@ module Sleek
       # Internal: Get Mongoid::Criteria for events to perform the query.
       #
       # time_range - the optional range of Time objects.
-      def events(time_range = time_range)
+      def events
         evts = namespace.events(bucket)
-        evts = evts.between("s.t" => time_range) if time_range
+        evts = evts.between("s.t" => timeframe) if timeframe?
         evts = apply_filters(evts) if filter?
         evts = Sleek::GroupByCriteria.new(evts, "d.#{group_by}") if group_by.present?
         evts
@@ -49,22 +50,6 @@ module Sleek
         filters.map { |f| Sleek::Filter.new(*f) }
       end
 
-      # Internal: Get timeframe for the query.
-      #
-      # Returns nil if no timeframe was passed to initializer.
-      def timeframe
-        Sleek::Timeframe.new(options[:timeframe]) if timeframe?
-      end
-
-      # Internal: Get timeframe range.
-      def time_range
-        timeframe.try(:to_time_range)
-      end
-
-      def series
-        Sleek::Interval.new(options[:interval], timeframe).timeframes if series? && timeframe?
-      end
-
       # Internal: Check if options include filter.
       def filter?
         options[:filter].present?
@@ -72,12 +57,7 @@ module Sleek
 
       # Internal: Check if options include timeframe.
       def timeframe?
-        options[:timeframe].present?
-      end
-
-      # Internal: Check if options include interval.
-      def series?
-        options[:interval].present?
+        timeframe.present?
       end
 
       # Internal: Get group_by property.
@@ -87,13 +67,7 @@ module Sleek
 
       # Internal: Run the query.
       def run
-        if series?
-          series.map do |tf|
-            { timeframe: tf, value: perform(events(tf.to_time_range)) }
-          end
-        else
-          perform(events)
-        end
+        perform(events)
       end
 
       # Internal: Perform the query on a set of events.
@@ -103,8 +77,7 @@ module Sleek
 
       # Internal: Validate the options.
       def valid_options?
-        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true) &&
-          (series? ? timeframe? && series : true)
+        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true)
       end
     end
   end
