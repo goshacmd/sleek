@@ -4,26 +4,6 @@ describe Sleek::Timeframe do
   let(:start_time) { 1.day.ago }
   let(:end_time) { Time.now }
   let(:range) { start_time..end_time }
-  subject(:timeframe) { Sleek::Timeframe.new(range) }
-
-  describe "#start" do
-    it "returns timeframe start" do
-      expect(timeframe.start).to eq start_time
-    end
-  end
-
-  describe "#end" do
-    it "returns timeframe end" do
-      expect(timeframe.end).to eq end_time
-    end
-  end
-
-  describe "#to_time_range" do
-    it "transforms passed timeframe to range" do
-      Sleek::Timeframe.should_receive(:to_range).with(range)
-      timeframe.to_time_range
-    end
-  end
 
   describe ".to_range" do
     context "when passed a range" do

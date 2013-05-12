@@ -68,7 +68,7 @@ describe Sleek::QueryCommand do
 
       it "returns Sleek::Timeframe" do
         tf = double('timeframe')
-        Sleek::Timeframe.stub(:new).with(:this_day).and_return(tf)
+        Sleek::Timeframe.stub(:to_range).with(:this_day).and_return(tf)
         expect(command.timeframe).to eq tf
       end
     end
@@ -135,9 +135,9 @@ describe Sleek::QueryCommand do
       let(:result2) { double('result2') }
       let(:query1) { double('query1', run: result1) }
       let(:query2) { double('query2', run: result2) }
-      let(:tf1) { stub('tf1_range') }
-      let(:tf2) { stub('tf2_range') }
-      let(:series) { [stub('tf1', to_time_range: tf1), stub('tf2', to_time_range: tf2)] }
+      let(:tf1) { stub('tf1') }
+      let(:tf2) { stub('tf2') }
+      let(:series) { [tf1, tf2] }
 
       before do
         command.stub(series?: true, series: series)
@@ -158,8 +158,8 @@ describe Sleek::QueryCommand do
 
       it "returns combined result" do
         expect(command.run).to eq [
-          { timeframe: series.first, value: result1 },
-          { timeframe: series.last, value: result2 }
+          { timeframe: tf1, value: result1 },
+          { timeframe: tf2, value: result2 }
         ]
       end
     end

@@ -112,8 +112,8 @@ call. Using `:interval` also requires that you specify `:timeframe`.
 ```ruby
 sleek.queries.count(:purchases, timeframe: :this_2_days, interval: :daily)
 # => [
-#      {:timeframe=>#<Sleek::Timeframe 2013-01-01 00:00:00 UTC..2013-01-02 00:00:00 UTC>, :value=>10},
-#      {:timeframe=>#<Sleek::Timeframe 2013-01-02 00:00:00 UTC..2013-01-03 00:00:00 UTC>, :value=>24}
+#      {:timeframe=>2013-01-01 00:00:00 UTC..2013-01-02 00:00:00 UTC, :value=>10},
+#      {:timeframe=>2013-01-02 00:00:00 UTC..2013-01-03 00:00:00 UTC, :value=>24}
 #    ]
 ```
 

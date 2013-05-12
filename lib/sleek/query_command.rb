@@ -35,10 +35,10 @@ module Sleek
       @interval.present?
     end
 
-    # Internal: Create a Sleek::Timeframe form the timeframe
+    # Internal: Parse a time range from the timeframe description.
     # description.
     def timeframe
-      Sleek::Timeframe.new(@timeframe) if @timeframe
+      Sleek::Timeframe.to_range(@timeframe) if @timeframe
     end
 
     # Internal: Split timeframe into sub-timeframes of interval.
@@ -48,7 +48,7 @@ module Sleek
 
     # Internal: Instantiate a query object.
     #
-    # timeframe - the Sleek::Timeframe object.
+    # timeframe - the time range.
     def new_query(timeframe)
       klass.new(namespace, bucket, options.merge(timeframe: timeframe))
     end
@@ -57,7 +57,7 @@ module Sleek
     def run
       if series?
         series.map do |tf|
-          { timeframe: tf, value: new_query(tf.to_time_range).run }
+          { timeframe: tf, value: new_query(tf).run }
         end
       else
         new_query(timeframe).run

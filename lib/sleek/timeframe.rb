@@ -1,47 +1,17 @@
 module Sleek
   class Timeframe
-    # Internal: Initialize timeframe.
-    #
-    # timeframe - either a range of Time objects, an array of two Time
-    #             objects, or a special string.
-    #
-    # Possible special string format:
-    # (this|previous)_((\d+)_)?(minute|hour|day|week|month)s?
-    #
-    # Examples
-    #
-    #   Timeframe.new "this_2_days"
-    #
-    #   Timeframe.new "previous_hour"
-    def initialize(timeframe)
-      @timeframe = timeframe
-    end
-
-    # Public: Get timeframe start.
-    def start
-      to_time_range.begin
-    end
-
-    # Public: Get timeframe end.
-    def end
-      to_time_range.end
-    end
-
-    # Internal: Convert Timeframe instance to a range of Time objects.
-    def to_time_range
-      @range ||= self.class.to_range(@timeframe)
-    end
-
-    def inspect
-      "#<Sleek::Timeframe #{to_time_range}>"
-    end
-
     class << self
       # Internal: Transform the object passed to Timeframe initializer
       # into a range of Time objects.
       #
       # timeframe - either a Range of Time objects, a two-element array
       #             of Time Objects, or a special string.
+      #
+      # Examples
+      #
+      #   Timeframe.to_range :this_2_days
+      #
+      #   Timeframe.to_range :previous_hour
       #
       # Raises ArgumentError if passed object can't be processed.
       def to_range(timeframe)
