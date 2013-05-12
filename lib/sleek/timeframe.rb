@@ -43,12 +43,24 @@ module Sleek
         number ||= 1
         number = number.to_i
 
+        range = range_from_interval(interval, number)
+        range = range - 1.send(interval) if category == 'previous'
+        range
+      end
+
+      # Internal: Create a time range from interval type & number of
+      # intervals.
+      #
+      # interval - the String interval type name. Valid values are
+      #            minute, hour, day, week, and month.
+      # number   - the Integer number of periods.
+      #
+      # Returns the range of time objects.
+      def range_from_interval(interval, number = 1)
         end_point = Time.now.send("end_of_#{interval}").round
         start_point = end_point - number.send(interval)
 
-        range = start_point..end_point
-        range = range - 1.send(interval) if category == 'previous'
-        range
+        start_point..end_point
       end
     end
   end
