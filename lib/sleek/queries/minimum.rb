@@ -11,7 +11,7 @@ module Sleek
     #   sleek.queries.minimum(:purchases, target_property: "total")
     #   # => 19_99
     class Minimum < Query
-      include Targetable
+      require_target_property!
 
       def perform(events)
         events.min target_property

@@ -11,7 +11,7 @@ module Sleek
     #   sleek.queries.maximum(:purchases, target_property: "total")
     #   # => 199_99
     class Maximum < Query
-      include Targetable
+      require_target_property!
 
       def perform(events)
         events.max target_property

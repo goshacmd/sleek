@@ -11,7 +11,7 @@ module Sleek
     #   sleek.queries.average(:purchases, target_property: "total")
     #   # => 49_35
     class Average < Query
-      include Targetable
+      require_target_property!
 
       def perform(events)
         events.avg target_property

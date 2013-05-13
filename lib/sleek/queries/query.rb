@@ -1,7 +1,19 @@
 module Sleek
   module Queries
     class Query
+      class << self
+        def require_target_property!
+          @require_target_property = true
+        end
+
+        def require_target_property?
+          !!@require_target_property
+        end
+      end
+
       attr_reader :namespace, :bucket, :options, :timeframe
+
+      delegate :require_target_property?, to: 'self.class'
 
       # Internal: Initialize the query.
       #
@@ -65,6 +77,11 @@ module Sleek
         options[:group_by]
       end
 
+      # Internal: Get the target property.
+      def target_property
+        "d.#{options[:target_property]}" if options[:target_property].present?
+      end
+
       # Internal: Run the query.
       def run
         perform(events)
@@ -77,7 +94,8 @@ module Sleek
 
       # Internal: Validate the options.
       def valid_options?
-        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true)
+        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true) &&
+          (require_target_property? ? options[:target_property].present? : true)
       end
     end
   end

@@ -5,6 +5,13 @@ describe Sleek::Queries::Query do
   let(:namespace) { mock('namespace', name: :default) }
   subject(:query) { query_class.new(namespace, :purchases) }
 
+  describe ".require_target_property!" do
+    it "sets a flag indicating target property is required by the query" do
+      klass = Class.new(query_class)
+      expect { klass.require_target_property! }.to change { klass.require_target_property? }.from(false).to(true)
+    end
+  end
+
   describe "#initialize" do
     it "sets the namespace and bucket" do
       my_namespace = double('my_namespace', name: :my_namespace)
@@ -149,14 +156,30 @@ describe Sleek::Queries::Query do
 
   describe "#valid_options?" do
     context "when options is a hash" do
-      before { query.stub(options: {}) }
+      context "when target property is not required" do
+        before { query.stub(options: {}) }
 
-      it "is true" do
-        expect(query.valid_options?).to be_true
+        it "is true" do
+          expect(query.valid_options?).to be_true
+        end
+      end
+
+      context "when target property is required" do
+        before { query.stub(require_target_property?: true) }
+
+        it "is true if target property is specified" do
+          query.stub(options: { target_property: "total" })
+          expect(query.valid_options?).to be_true
+        end
+
+        it "is false if target property is not specified" do
+          query.stub(options: {})
+          expect(query.valid_options?).to be_false
+        end
       end
     end
 
-    context "when options isn't a hash" do
+    context "when options is not a hash" do
       before { query.stub(options: 1) }
 
       it "is false" do

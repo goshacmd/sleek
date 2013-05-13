@@ -11,7 +11,7 @@ module Sleek
     #   sleek.queries.sum(:purchases, target_property: "total")
     #   # => 2_072_70
     class Sum < Query
-      include Targetable
+      require_target_property!
 
       def perform(events)
         events.sum target_property

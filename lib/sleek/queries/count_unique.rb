@@ -11,7 +11,7 @@ module Sleek
     #   sleek.queries.count_unique(:purchases, target_property: "customer.email")
     #   # => 4
     class CountUnique < Query
-      include Targetable
+      require_target_property!
 
       def perform(events)
         events.distinct(target_property).count
