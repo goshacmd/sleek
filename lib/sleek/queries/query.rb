@@ -1,16 +1,23 @@
 module Sleek
   module Queries
+    # Public: The query.
+    #
+    # Queries are performed on a set of events and usually return
+    # numeric values. You shouldn't be using Sleek::Queries::Query
+    # directly, instead, you should subclass it and define `#perform` on
+    # it, which takes an events criteria and does its job.
+    #
+    # Sleek::Queries::Query would take care of processing options,
+    # filtering events, handling series and groups.
+    #
+    # Examples
+    #
+    #   class SomeQuery < Query
+    #     def perform(events)
+    #       ...
+    #     end
+    #   end
     class Query
-      class << self
-        def require_target_property!
-          @require_target_property = true
-        end
-
-        def require_target_property?
-          !!@require_target_property
-        end
-      end
-
       attr_reader :namespace, :bucket, :options, :timeframe
 
       delegate :require_target_property?, to: 'self.class'
@@ -30,7 +37,7 @@ module Sleek
         @options = options
         @timeframe = options[:timeframe]
 
-        raise ArgumentError, "options are invalid" unless valid_options?
+        raise ArgumentError, 'options are invalid' unless valid_options?
       end
 
       # Internal: Get Mongoid::Criteria for events to perform the query.
@@ -38,21 +45,25 @@ module Sleek
       # time_range - the optional range of Time objects.
       def events
         evts = namespace.events(bucket)
-        evts = evts.between("s.t" => timeframe) if timeframe?
+        evts = evts.between('s.t' => timeframe) if timeframe?
         evts = apply_filters(evts) if filter?
-        evts = Sleek::GroupByCriteria.new(evts, "d.#{group_by}") if group_by.present?
+
+        if group_by.present?
+          evts = Sleek::GroupByCriteria.new(evts, "d.#{group_by}")
+        end
+
         evts
       end
 
       # Internal: Apply all the filters to the criteria.
       def apply_filters(criteria)
-        filters.inject(criteria) { |crit, filter| filter.apply(crit) }
+        filters.reduce(criteria) { |crit, filter| filter.apply(crit) }
       end
 
       # Internal: Get filters.
       def filters
         filters = options[:filter]
-        
+
         if filters.is_a?(Array) && filters.size == 3 && filters.none? { |f| f.is_a?(Array) }
           filters = [filters]
         elsif !filters.is_a?(Array) || !filters.all? { |f| f.is_a?(Array) && f.size == 3 }
@@ -79,7 +90,9 @@ module Sleek
 
       # Internal: Get the target property.
       def target_property
-        "d.#{options[:target_property]}" if options[:target_property].present?
+        if options[:target_property].present?
+          "d.#{options[:target_property]}"
+        end
       end
 
       # Internal: Run the query.
@@ -94,8 +107,31 @@ module Sleek
 
       # Internal: Validate the options.
       def valid_options?
-        options.is_a?(Hash) && (filter? ? options[:filter].is_a?(Array) : true) &&
+        options.is_a?(Hash) &&
+          (filter? ? options[:filter].is_a?(Array) : true) &&
           (require_target_property? ? options[:target_property].present? : true)
+      end
+
+      class << self
+        # Public: Indicate that the query requires target property.
+        #
+        # Examples
+        #
+        #   class SomeQuery < Query
+        #     require_target_property!
+        #
+        #     def perform(events)
+        #       ...
+        #     end
+        #   end
+        def require_target_property!
+          @require_target_property = true
+        end
+
+        # Public: Check if the query requires target property.
+        def require_target_property?
+          !!@require_target_property
+        end
       end
     end
   end

@@ -43,7 +43,7 @@ module Sleek
         _, category, _, number, interval = *timeframe.match(REGEXP)
 
         unless category && interval
-          raise ArgumentError, "special timeframe string is malformed"
+          raise ArgumentError, 'special timeframe string is malformed'
         end
 
         number ||= 1

@@ -29,7 +29,9 @@ module Sleek
       @interval = options.delete(:interval)
       @options = options
 
-      raise ArgumentError, "interval requires timeframe" if @interval.present? && @timeframe.blank?
+      if @interval.present? && @timeframe.blank?
+        raise ArgumentError, 'interval requires timeframe'
+      end
     end
 
     # Internal: Check if options include interval.

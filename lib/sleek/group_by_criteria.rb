@@ -38,12 +38,16 @@ module Sleek
     # Examples:
     #
     #   gc.aggregates
-    #   # => [{"_id"=>"customer1", "count"=>2}, {"_id"=>"customer2", "count" => 1}]
+    #   # => [
+    #          {"_id"=>"customer1", "count"=>2},
+    #          {"_id"=>"customer2", "count" => 1}
+    #        ]
     #
     # Returns an array of groups. Each group is a hash with key "_id"
     # being the value of group_by property.
     def aggregates(field = nil, count_unique = false)
-      criteria.collection.aggregate(aggregates_pipeline(field, count_unique)).to_a
+      pipeline = aggregates_pipeline(field, count_unique)
+      criteria.collection.aggregate(pipeline).to_a
     end
 
     # Internal: Run the aggregation on field and only select group value
@@ -54,15 +58,16 @@ module Sleek
     #   gc.aggregates_prop(nil, "count")
     #   # => { unique_value_1: 42, unique_value_2: 12 }
     def aggregates_prop(field, prop, count_unique = false)
-      Hash[aggregates(field, count_unique).map { |doc| [doc["_id"], doc[prop]] }]
+      aggregates = aggregates(field, count_unique)
+      Hash[aggregates.map { |doc| [doc['_id'], doc[prop]] }]
     end
 
     def count
-      aggregates_prop(nil, "count")
+      aggregates_prop(nil, 'count')
     end
 
     def count_unique(field)
-      aggregates_prop(field, "count_unique", true)
+      aggregates_prop(field, 'count_unique', true)
     end
 
     def distinct(field)
@@ -70,19 +75,19 @@ module Sleek
     end
 
     def avg(field)
-      aggregates_prop(field, "avg")
+      aggregates_prop(field, 'avg')
     end
 
     def max(field)
-      aggregates_prop(field, "max")
+      aggregates_prop(field, 'max')
     end
 
     def min(field)
-      aggregates_prop(field, "min")
+      aggregates_prop(field, 'min')
     end
 
     def sum(field)
-      aggregates_prop(field, "sum")
+      aggregates_prop(field, 'sum')
     end
 
     # Internal: Create aggregation pipeline.

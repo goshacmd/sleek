@@ -19,7 +19,8 @@ module Sleek
     field :ns, type: Symbol, as: :namespace
     field :b, type: String, as: :bucket
     field :d, type: Hash, as: :data
-    embeds_one :sleek, store_as: "s", class_name: 'Sleek::EventMetadata', cascade_callbacks: true
+    embeds_one :sleek, store_as: 's', class_name: 'Sleek::EventMetadata',
+      cascade_callbacks: true
     accepts_nested_attributes_for :sleek
 
     validates :namespace, presence: true
@@ -27,7 +28,7 @@ module Sleek
 
     after_initialize { build_sleek }
 
-    index ns: 1, b: 1, "s.t" => 1
+    index ns: 1, b: 1, 's.t' => 1
 
     def self.create_with_namespace(namespace, bucket, payload)
       sleek = payload.delete(:sleek)

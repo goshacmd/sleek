@@ -34,12 +34,10 @@ class Range
   #   (1200..1300).previous
   #   # => 1100..1200
   def previous(n = 1)
-    new_begin = self.begin - difference * n
-    new_end = self.end - difference * n
-    new_begin..new_end
+    self - difference * n
   end
 
-  def -(what)
-    (self.begin - what)..(self.end - what)
+  def -(other)
+    (self.begin - other)..(self.end - other)
   end
 end
