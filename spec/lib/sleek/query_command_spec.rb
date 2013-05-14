@@ -4,12 +4,13 @@ describe Sleek::QueryCommand do
   let(:query_class) { double('query_class') }
   let(:namespace) { double('namespace', name: :default) }
   let(:bucket) { :purchases }
-  subject(:command) { Sleek::QueryCommand.new(query_class, namespace, bucket) }
+  let(:options) { {} }
+  subject(:command) { described_class.new(query_class, namespace, bucket, options) }
 
   describe "#initialize" do
     context "when no timeframe is provided" do
       context "when interval is not provided" do
-        let(:command) { Sleek::QueryCommand.new(query_class, namespace, bucket, { some: :opts }) }
+        let(:command) { described_class.new(query_class, namespace, bucket, { some: :opts }) }
 
         it "sets class" do
           expect(command.klass).to eq query_class
@@ -31,7 +32,7 @@ describe Sleek::QueryCommand do
       context "when interval is provided" do
         it "raises an exception" do
           expect {
-            Sleek::QueryCommand.new(query_class, namespace, bucket, interval: :daily)
+            described_class.new(query_class, namespace, bucket, interval: :daily)
           }.to raise_exception ArgumentError, "interval requires timeframe"
         end
       end
@@ -39,9 +40,7 @@ describe Sleek::QueryCommand do
 
     context "when timeframe is provided" do
       context "when interval is not provided" do
-        let(:command) do
-          Sleek::QueryCommand.new(query_class, namespace, bucket, { some: :opts, timeframe: :this_day })
-        end
+        let(:options) { { some: :opts, timeframe: :this_day } }
 
         it "deletes timeframe from options" do
           expect(command.options).to eq some: :opts
@@ -49,9 +48,7 @@ describe Sleek::QueryCommand do
       end
 
       context "when interval is provided" do
-        let(:command) do
-          Sleek::QueryCommand.new(query_class, namespace, bucket, { some: :opts, timeframe: :this_day, interval: :hourly })
-        end
+        let(:options) { { some: :opts, timeframe: :this_day, interval: :hourly } }
 
         it "deletes timeframe and interval from options" do
           expect(command.options).to eq some: :opts
@@ -63,9 +60,7 @@ describe Sleek::QueryCommand do
   describe "#timeframe" do
     context "when initialized with timeframe" do
       context "when initialized without timezone" do
-        subject(:command) do
-          Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day)
-        end
+        let(:options) { { timeframe: :this_day } }
 
         it "constructs timeframe" do
           tf = double('timeframe')
@@ -75,9 +70,7 @@ describe Sleek::QueryCommand do
       end
 
       context "when initialized with timezone" do
-        subject(:command) do
-          Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day, timezone: 'US/Pacific')
-        end
+        let(:options) { { timeframe: :this_day, timezone: 'US/Pacific' } }
 
         it "constructs timeframe with time zone" do
           tf = double('timeframe')
@@ -92,10 +85,7 @@ describe Sleek::QueryCommand do
     context "when initialized with timeframe and interval" do
       let(:tf) { double('timeframe') }
       let(:interval) { double('interval', timeframes: []) }
-
-      subject(:command) do
-        Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day, interval: :hourly)
-      end
+      let(:options) { { timeframe: :this_day, interval: :hourly } }
 
       before do
         Sleek::Interval.stub(:new).and_return(interval)

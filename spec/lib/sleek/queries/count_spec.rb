@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Sleek::Queries::Count do
-  subject(:query) { Sleek::Queries::Count.new(:default, :purchases) }
+  subject(:query) { described_class.new(:default, :purchases) }
 
   describe "#perform" do
     it "counts the events" do

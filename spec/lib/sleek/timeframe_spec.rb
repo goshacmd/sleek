@@ -9,13 +9,13 @@ describe Sleek::Timeframe do
     context "when passed a range" do
       context "when the range is of Time objects" do
         it "returns that range" do
-          expect(Sleek::Timeframe.to_range(range)).to eq range
+          expect(described_class.to_range(range)).to eq range
         end
       end
 
       context "when passed other range" do
         it "raises an exception" do
-          expect { Sleek::Timeframe.to_range(1..3) }.to raise_exception ArgumentError
+          expect { described_class.to_range(1..3) }.to raise_exception ArgumentError
         end
       end
     end
@@ -23,14 +23,14 @@ describe Sleek::Timeframe do
     context "when passed an array" do
       context "when array has two Time elements" do
         it "constructs the range" do
-          expect(Sleek::Timeframe.to_range([start_time, end_time])).to eq range
+          expect(described_class.to_range([start_time, end_time])).to eq range
         end
       end
 
       context "when passed other array" do
         it "raises an exception" do
-          expect { Sleek::Timeframe.to_range([1, 2]) }.to raise_exception ArgumentError
-          expect { Sleek::Timeframe.to_range([start_time, end_time, end_time]) }.to raise_exception ArgumentError
+          expect { described_class.to_range([1, 2]) }.to raise_exception ArgumentError
+          expect { described_class.to_range([start_time, end_time, end_time]) }.to raise_exception ArgumentError
         end
       end
     end
@@ -38,22 +38,22 @@ describe Sleek::Timeframe do
     context "when passed a string or a symbol" do
       context "without timezone" do
         it "tries to parse it" do
-          Sleek::Timeframe.should_receive(:parse).with('this_day', nil)
-          Sleek::Timeframe.to_range('this_day')
+          described_class.should_receive(:parse).with('this_day', nil)
+          described_class.to_range('this_day')
         end
       end
 
       context "with timezone" do
         it "tries to parse it with appropriate timezone" do
-          Sleek::Timeframe.should_receive(:parse).with('this_day', 'US/Pacific')
-          Sleek::Timeframe.to_range('this_day', 'US/Pacific')
+          described_class.should_receive(:parse).with('this_day', 'US/Pacific')
+          described_class.to_range('this_day', 'US/Pacific')
         end
       end
     end
 
     context "when passed something else" do
       it "raises an exception" do
-        expect { Sleek::Timeframe.to_range(some_object: 1) }.to raise_exception ArgumentError
+        expect { described_class.to_range(some_object: 1) }.to raise_exception ArgumentError
       end
     end
   end
@@ -61,18 +61,18 @@ describe Sleek::Timeframe do
   describe ".parse" do
     context "when passed the proper string" do
       it "creates range from interval and number, preserving timezone" do
-        Sleek::Timeframe.should_receive(:range_from_interval).with('day', 2, 'US/Pacific')
-        Sleek::Timeframe.parse('this_2_days', 'US/Pacific')
+        described_class.should_receive(:range_from_interval).with('day', 2, 'US/Pacific')
+        described_class.parse('this_2_days', 'US/Pacific')
       end
 
       it "parses the string and returns time range" do
         tz = ActiveSupport::TimeZone.new('UTC')
 
-        td = Sleek::Timeframe.parse('this_day')
+        td = described_class.parse('this_day')
         expect(td.begin).to eq tz.now.beginning_of_day
         expect(td.end).to eq tz.now.end_of_day.round
 
-        p2w = Sleek::Timeframe.parse('previous_2_weeks')
+        p2w = described_class.parse('previous_2_weeks')
         expect(p2w.begin).to eq tz.now.beginning_of_week - 2.weeks
         expect(p2w.end).to eq tz.now.end_of_week.round - 1.weeks
       end
@@ -80,7 +80,7 @@ describe Sleek::Timeframe do
 
     context "when passed malformed string" do
       it "raises an exception" do
-        expect { Sleek::Timeframe.parse('lol_wut') }.to raise_exception ArgumentError, "special timeframe string is malformed"
+        expect { described_class.parse('lol_wut') }.to raise_exception ArgumentError, "special timeframe string is malformed"
       end
     end
   end
@@ -93,7 +93,7 @@ describe Sleek::Timeframe do
       before { ActiveSupport::TimeZone.stub_chain(:new, :now).and_return(now) }
 
       it "creates a range" do
-        expect(Sleek::Timeframe.range_from_interval("day", 1)).to eq 1.day..2.days
+        expect(described_class.range_from_interval("day", 1)).to eq 1.day..2.days
       end
     end
 
@@ -109,11 +109,11 @@ describe Sleek::Timeframe do
         ActiveSupport::TimeZone.should_receive(:new).with('US/Pacific')
         tz.should_receive(:now)
 
-        Sleek::Timeframe.range_from_interval('day', 1, 'US/Pacific')
+        described_class.range_from_interval('day', 1, 'US/Pacific')
       end
 
       it "creates a range" do
-        expect(Sleek::Timeframe.range_from_interval('day', 1, 'US/Pacific')).to eq 1.day..2.days
+        expect(described_class.range_from_interval('day', 1, 'US/Pacific')).to eq 1.day..2.days
       end
     end
   end

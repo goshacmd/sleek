@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Sleek::Queries::Query do
-  let(:query_class) { Sleek::Queries::Query }
+  let(:query_class) { described_class }
   let(:namespace) { mock('namespace', name: :default) }
   subject(:query) { query_class.new(namespace, :purchases) }
 
@@ -15,7 +15,7 @@ describe Sleek::Queries::Query do
   describe "#initialize" do
     it "sets the namespace and bucket" do
       my_namespace = double('my_namespace', name: :my_namespace)
-      query = Sleek::Queries::Query.new(my_namespace, :purchases)
+      query = described_class.new(my_namespace, :purchases)
       expect(query.namespace).to eq my_namespace
       expect(query.bucket).to eq :purchases
     end

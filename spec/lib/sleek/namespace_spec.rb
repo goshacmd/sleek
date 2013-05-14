@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Sleek::Namespace do
-  subject(:sleek) { Sleek::Namespace.new(:default) }
+  subject(:sleek) { described_class.new(:default) }
 
   describe "#initialize" do
     it "sets the namespace" do
-      sleek = Sleek::Namespace.new(:my_namespace)
+      sleek = described_class.new(:my_namespace)
       expect(sleek.name).to eq :my_namespace
     end
   end

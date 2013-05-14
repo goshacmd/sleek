@@ -5,7 +5,7 @@ describe Sleek::GroupByCriteria do
   let(:criteria) { mock('criteria', collection: collection) }
   let(:group_by) { "d.field" }
   let(:db_group) { "$d.field" }
-  subject(:crit) { Sleek::GroupByCriteria.new(criteria, group_by) }
+  subject(:crit) { described_class.new(criteria, group_by) }
 
   describe "#aggregates" do
     it "makes up the pipeline" do

@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Sleek::Interval do
   describe "#initialize" do
     it "transforms interval description into value" do
-      Sleek::Interval.should_receive(:interval_value).with(:hourly)
-      Sleek::Interval.new(:hourly, Time.now.all_day)
+      described_class.should_receive(:interval_value).with(:hourly)
+      described_class.new(:hourly, Time.now.all_day)
     end
   end
 
@@ -12,7 +12,7 @@ describe Sleek::Interval do
     it "slices timeframe into interval-long timeframes" do
       now = ActiveSupport::TimeZone.new('UTC').now
       bd = now.beginning_of_day
-      interval = Sleek::Interval.new(:hourly, now.all_day)
+      interval = described_class.new(:hourly, now.all_day)
       expect(interval.timeframes.count).to eq 23
 
       23.times do |i|

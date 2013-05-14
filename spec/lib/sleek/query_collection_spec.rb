@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe Sleek::QueryCollection do
   let(:namespace) { stub('namespace', name: :default) }
-  subject(:collection) { Sleek::QueryCollection.new(namespace) }
+  subject(:collection) { described_class.new(namespace) }
 
   describe "#initialize" do
     it "sets the namespace" do
       my_namespace = stub('my_namespace', name: :my_namespace)
-      collection = Sleek::QueryCollection.new(my_namespace)
+      collection = described_class.new(my_namespace)
       expect(collection.namespace).to eq my_namespace
     end
   end

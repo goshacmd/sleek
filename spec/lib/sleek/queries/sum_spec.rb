@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Sleek::Queries::Sum do
-  subject(:query) { Sleek::Queries::Sum.new(:default, :purchases, target_property: "total") }
+  subject(:query) { described_class.new(:default, :purchases, target_property: "total") }
 
   describe "#perform" do
     it "counts the events" do

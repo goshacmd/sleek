@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Sleek::Queries::CountUnique do
-  subject(:query) { Sleek::Queries::CountUnique.new(:default, :purchases, target_property: "customer.id") }
+  subject(:query) { described_class.new(:default, :purchases, target_property: "customer.id") }
 
   describe "#perform" do
     it "counts the events" do
