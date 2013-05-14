@@ -62,14 +62,28 @@ describe Sleek::QueryCommand do
 
   describe "#timeframe" do
     context "when initialized with timeframe" do
-      subject(:command) do
-        Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day)
+      context "when initialized without timezone" do
+        subject(:command) do
+          Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day)
+        end
+
+        it "constructs timeframe" do
+          tf = double('timeframe')
+          Sleek::Timeframe.stub(:to_range).with(:this_day, nil).and_return(tf)
+          expect(command.timeframe).to eq tf
+        end
       end
 
-      it "returns Sleek::Timeframe" do
-        tf = double('timeframe')
-        Sleek::Timeframe.stub(:to_range).with(:this_day).and_return(tf)
-        expect(command.timeframe).to eq tf
+      context "when initialized with timezone" do
+        subject(:command) do
+          Sleek::QueryCommand.new(query_class, namespace, bucket, timeframe: :this_day, timezone: 'US/Pacific')
+        end
+
+        it "constructs timeframe with time zone" do
+          tf = double('timeframe')
+          Sleek::Timeframe.stub(:to_range).with(:this_day, 'US/Pacific').and_return(tf)
+          expect(command.timeframe).to eq tf
+        end
       end
     end
   end

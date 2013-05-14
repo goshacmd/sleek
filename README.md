@@ -284,6 +284,28 @@ sleek.queries.count(:purchases, filters: [:total, :gt, 1599])
 # => 20
 ```
 
+### Timeframe & timezone
+
+You can pass the `:timeframe` with or without `:timezone` to any query.
+
+Timeframe is used to limit your query by some window of time. You can
+use a range of `TimeWithRange` objects to specify absolute timeframe, or
+you can use a string that describes relative timeframe.
+
+Relative timeframe string (or a symbol) consists of these parts: category,
+optional number, and interval specification. Possible categories are `this`
+and `previous`, possible intervals are `minute`, `hour`, `day`, `week`,
+`month`.
+
+Examples: `this_day`, `previous_3_weeks`.
+
+By default, relative times are transformed into ranges of time objects
+in UTC timezone. You can, however, pass the `:timezone` option to tell
+Sleek to construct the window of time in the given timezone.
+
+Refer to [`ActiveSupport::TimeZone` docs](http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html)
+for more details on possible timezone identifiers.
+
 ## Other
 
 ### Deleting namespace

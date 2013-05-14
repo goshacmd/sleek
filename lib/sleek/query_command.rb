@@ -14,6 +14,7 @@ module Sleek
     #             :timeframe and :interval will be passed on to the
     #             query class.
     #             :timeframe - the optional timeframe description.
+    #             :timezone  - the optional TZ identifier.
     #             :interval  - the optional interval description. If
     #                          passed, requires that :timeframe is passed
     #                          as well.
@@ -24,6 +25,7 @@ module Sleek
       @namespace = namespace
       @bucket = bucket
       @timeframe = options.delete(:timeframe)
+      @timezone = options.delete(:timezone)
       @interval = options.delete(:interval)
       @options = options
 
@@ -38,7 +40,7 @@ module Sleek
     # Internal: Parse a time range from the timeframe description.
     # description.
     def timeframe
-      Sleek::Timeframe.to_range(@timeframe) if @timeframe
+      Sleek::Timeframe.to_range(@timeframe, @timezone) if @timeframe
     end
 
     # Internal: Split timeframe into sub-timeframes of interval.

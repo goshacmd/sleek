@@ -8,6 +8,8 @@ module Sleek
       #
       # timeframe - either a Range of Time objects, a two-element array
       #             of Time Objects, or a special string.
+      # timezone  - the optional String TZ identifier. See
+      #             `ActiveSupport::TimeZone`.
       #
       # Examples
       #
@@ -15,15 +17,17 @@ module Sleek
       #
       #   Timeframe.to_range :previous_hour
       #
+      #   Timeframe.to_range :this_day, timezone: 'US/Pacific'
+      #
       # Raises ArgumentError if passed object can't be processed.
-      def to_range(timeframe)
+      def to_range(timeframe, timezone = nil)
         case timeframe
         when proc { |tf| tf.is_a?(Range) && tf.time_range? }
           t = timeframe
         when proc { |tf| tf.is_a?(Array) && tf.size == 2 && tf.count { |_tf| _tf.is_a?(Time) } == 2 }
           t = timeframe.first..timeframe.last
         when String, Symbol
-          t = parse(timeframe.to_s)
+          t = parse(timeframe.to_s, timezone)
         else
           raise ArgumentError, "wrong timeframe - #{timeframe}"
         end
@@ -33,7 +37,9 @@ module Sleek
       #
       # timeframe - the String matching
       #             (this|previous)_((\d+)_)?(minute|hour|day|week|month)s?
-      def parse(timeframe)
+      # timezone  - the optional String TZ identifier. See
+      #             `ActiveSupport::TimeZone`.
+      def parse(timeframe, timezone = nil)
         _, category, _, number, interval = *timeframe.match(REGEXP)
 
         unless category && interval
@@ -43,7 +49,7 @@ module Sleek
         number ||= 1
         number = number.to_i
 
-        range = range_from_interval(interval, number)
+        range = range_from_interval(interval, number, timezone)
         range = range - 1.send(interval) if category == 'previous'
         range
       end
@@ -54,10 +60,15 @@ module Sleek
       # interval - the String interval type name. Valid values are
       #            minute, hour, day, week, and month.
       # number   - the Integer number of periods.
+      # timezone  - the optional String TZ identifier. See
+      #             `ActiveSupport::TimeZone`.
       #
-      # Returns the range of time objects.
-      def range_from_interval(interval, number = 1)
-        end_point = Time.now.send("end_of_#{interval}").round
+      # Returns the range of TimeWithZone objects.
+      def range_from_interval(interval, number = 1, timezone = nil)
+        timezone ||= 'UTC'
+        now = ActiveSupport::TimeZone.new(timezone).now
+
+        end_point = now.send("end_of_#{interval}").round
         start_point = end_point - number.send(interval)
 
         start_point..end_point

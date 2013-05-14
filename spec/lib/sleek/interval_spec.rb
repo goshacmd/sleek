@@ -10,8 +10,9 @@ describe Sleek::Interval do
 
   describe "#timeframes" do
     it "slices timeframe into interval-long timeframes" do
-      bd = Time.now.beginning_of_day
-      interval = Sleek::Interval.new(:hourly, Time.now.all_day)
+      now = ActiveSupport::TimeZone.new('UTC').now
+      bd = now.beginning_of_day
+      interval = Sleek::Interval.new(:hourly, now.all_day)
       expect(interval.timeframes.count).to eq 23
 
       23.times do |i|

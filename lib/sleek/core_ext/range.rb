@@ -5,8 +5,9 @@ class Range
   end
 
   # Public: Convert both ends of range to times.
-  def to_time_range
-    Time.at(self.begin)..Time.at(self.end)
+  def to_time_range(zone = nil)
+    time = zone ? zone : Time
+    time.at(self.begin)..time.at(self.end)
   end
 
   def int_range?
