@@ -17,12 +17,10 @@ module Sleek
     #
     # Returns an Array of time range objects.
     def timeframes
-      @timeframes ||= begin
-        tz = timeframe.first.time_zone
-        timeframe.to_i_range.each_slice(interval)
-          .to_a[0..-2]
-          .map { |tf, _| (tf..(tf + interval)).to_time_range(tz) }
-      end
+      tz = timeframe.first.time_zone
+      timeframe.to_i_range.each_slice(interval)
+        .to_a[0..-2]
+        .map { |tf, _| (tf..(tf + interval)).to_time_range(tz) }
     end
 
     # Internal: Convert interval description to numeric value.
