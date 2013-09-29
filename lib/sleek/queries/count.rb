@@ -14,4 +14,6 @@ module Sleek
       end
     end
   end
+
+  QueryCollection.register :count, Queries::Count
 end

@@ -18,4 +18,6 @@ module Sleek
       end
     end
   end
+
+  QueryCollection.register :count_unique, Queries::CountUnique
 end

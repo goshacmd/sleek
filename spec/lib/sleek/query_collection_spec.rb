@@ -12,18 +12,20 @@ describe Sleek::QueryCollection do
     end
   end
 
-  describe "query methods" do
-    it "creates query command" do
+  describe ".register" do
+    it "defines a query method" do
+      Sleek::QueryCollection.register(:test_count, Sleek::Queries::Count)
       Sleek::QueryCommand.should_receive(:new).with(Sleek::Queries::Count, namespace, :purchases, { some: :opts }).and_return(stub.as_null_object)
-      collection.count(:purchases, { some: :opts })
+      collection.test_count(:purchases, { some: :opts })
     end
 
     it "runs the query command" do
+      Sleek::QueryCollection.register(:test_count, Sleek::Queries::Count)
       query_command = stub('query_command')
       Sleek::QueryCommand.should_receive(:new).and_return(query_command)
       query_command.should_receive(:run)
 
-      collection.count(:purchases)
+      collection.test_count(:purchases)
     end
   end
 end

@@ -18,4 +18,6 @@ module Sleek
       end
     end
   end
+
+  QueryCollection.register :average, Queries::Average
 end

@@ -9,9 +9,9 @@ require 'sleek/interval'
 require 'sleek/filter'
 require 'sleek/group_by_criteria'
 require 'sleek/event'
-require 'sleek/queries'
 require 'sleek/query_command'
 require 'sleek/query_collection'
+require 'sleek/queries'
 require 'sleek/namespace'
 
 module Sleek
