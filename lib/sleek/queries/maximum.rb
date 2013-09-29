@@ -19,5 +19,5 @@ module Sleek
     end
   end
 
-  QueryCollection.register :maximum, Queries::Maximum
+  QueryCollection.register :maximum, Queries::Maximum, alias: :max
 end

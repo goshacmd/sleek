@@ -19,6 +19,12 @@ describe Sleek::QueryCollection do
       collection.test_count(:purchases, { some: :opts })
     end
 
+    it "defines an alias" do
+      Sleek::QueryCollection.register(:test_count, Sleek::Queries::Count, alias: :tst)
+      Sleek::QueryCommand.should_receive(:new).with(Sleek::Queries::Count, namespace, :purchases, { some: :opts }).and_return(stub.as_null_object)
+      collection.tst(:purchases, { some: :opts })
+    end
+
     it "runs the query command" do
       Sleek::QueryCollection.register(:test_count, Sleek::Queries::Count)
       query_command = stub('query_command')
@@ -26,6 +32,15 @@ describe Sleek::QueryCollection do
       query_command.should_receive(:run)
 
       collection.test_count(:purchases)
+    end
+  end
+
+  describe ".alias_query" do
+    it "aliases query method" do
+      Sleek::QueryCollection.register(:test_count, Sleek::Queries::Count)
+      Sleek::QueryCollection.alias_query(:test_count, :tst1)
+      Sleek::QueryCommand.should_receive(:new).with(Sleek::Queries::Count, namespace, :purchases, { some: :opts }).and_return(stub.as_null_object)
+      collection.test_count(:purchases, { some: :opts })
     end
   end
 end

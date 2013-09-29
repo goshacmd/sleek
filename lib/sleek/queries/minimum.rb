@@ -19,5 +19,5 @@ module Sleek
     end
   end
 
-  QueryCollection.register :minimum, Queries::Minimum
+  QueryCollection.register :minimum, Queries::Minimum, alias: :min
 end

@@ -19,5 +19,5 @@ module Sleek
     end
   end
 
-  QueryCollection.register :average, Queries::Average
+  QueryCollection.register :average, Queries::Average, alias: :avg
 end
