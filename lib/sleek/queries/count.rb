@@ -1,11 +1,10 @@
 module Sleek
   module Queries
-    # Internal: Count query.
+    # Count query.
     #
     # Simply counts events.
     #
-    # Examples
-    #
+    # @example
     #   sleek.queries.count(:purchases)
     #   # => 42
     class Count < Query

@@ -1,13 +1,12 @@
 module Sleek
   module Queries
-    # Internal: Maximum query.
+    # Maximum query.
     #
     # Finds the maximum value for a given property.
     #
-    # target_property - the String name of target property on event.
+    # @param target_property [String] name of target property on event
     #
-    # Examples
-    #
+    # @example
     #   sleek.queries.maximum(:purchases, target_property: "total")
     #   # => 199_99
     class Maximum < Query

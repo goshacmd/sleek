@@ -1,20 +1,19 @@
 module Sleek
   module Queries
-    # Public: The query.
+    # The query.
     #
     # Queries are performed on a set of events and usually return
     # numeric values. You shouldn't be using Sleek::Queries::Query
-    # directly, instead, you should subclass it and define `#perform` on
+    # directly, instead, you should subclass it and define +#perform+ on
     # it, which takes an events criteria and does its job.
     #
     # Sleek::Queries::Query would take care of processing options,
     # filtering events, handling series and groups.
     #
-    # Examples
-    #
+    # @example
     #   class SomeQuery < Query
     #     def perform(events)
-    #       ...
+    #       # ...
     #     end
     #   end
     class Query
@@ -22,15 +21,16 @@ module Sleek
 
       delegate :require_target_property?, to: 'self.class'
 
-      # Internal: Initialize the query.
+      # Iinitialize a new +Query+.
       #
-      # namespace - the Sleek::Namespace object.
-      # bucket    - the String bucket name.
-      # options   - the optional Hash of options.
-      #             :timeframe - the optional timeframe description.
-      #             :interval  - the optional interval description.
+      # @param namespace [Namespace]
+      # @param bucket [String] bucket name
+      # @param option [Hash] options
       #
-      # Raises ArgumentError if passed options are invalid.
+      # @option options [String] :timeframe timeframe description
+      # @option options [String] :interval interval description
+      #
+      # @raise ArgumentError if passed options are invalid
       def initialize(namespace, bucket, options = {})
         @namespace = namespace
         @bucket = bucket
@@ -40,9 +40,11 @@ module Sleek
         raise ArgumentError, 'options are invalid' unless valid_options?
       end
 
-      # Internal: Get Mongoid::Criteria for events to perform the query.
+      # Get criteria for events to perform the query.
       #
-      # time_range - the optional range of Time objects.
+      # @param time_range [Range<Time>]
+      #
+      # @return [Mongoid::Criteria]
       def events
         evts = namespace.events(bucket)
         evts = evts.between('s.t' => timeframe) if timeframe?
@@ -55,12 +57,16 @@ module Sleek
         evts
       end
 
-      # Internal: Apply all the filters to the criteria.
+      # Apply all the filters to the criteria.
+      #
+      # @param criteria [Mongoid::Criteria]
       def apply_filters(criteria)
         filters.reduce(criteria) { |crit, filter| filter.apply(crit) }
       end
 
-      # Internal: Get filters.
+      # Get filters.
+      #
+      # @return [Array<Filter>]
       def filters
         filters = options[:filter]
 
@@ -73,12 +79,12 @@ module Sleek
         filters.map { |f| Sleek::Filter.new(*f) }
       end
 
-      # Internal: Check if options include filter.
+      # Check if options include filter.
       def filter?
         options[:filter].present?
       end
 
-      # Internal: Check if options include timeframe.
+      # Check if options include timeframe.
       def timeframe?
         timeframe.present?
       end
@@ -88,24 +94,24 @@ module Sleek
         options[:group_by]
       end
 
-      # Internal: Get the target property.
+      # Get the target property.
       def target_property
         if options[:target_property].present?
           "d.#{options[:target_property]}"
         end
       end
 
-      # Internal: Run the query.
+      # Run the query.
       def run
         perform(events)
       end
 
-      # Internal: Perform the query on a set of events.
+      # Perform the query on a set of events.
       def perform(events)
         raise NotImplementedError
       end
 
-      # Internal: Validate the options.
+      # Validate the options.
       def valid_options?
         options.is_a?(Hash) &&
           (filter? ? options[:filter].is_a?(Array) : true) &&
@@ -113,22 +119,21 @@ module Sleek
       end
 
       class << self
-        # Public: Indicate that the query requires target property.
+        # Indicate that the query requires target property.
         #
-        # Examples
-        #
+        # @example
         #   class SomeQuery < Query
         #     require_target_property!
         #
         #     def perform(events)
-        #       ...
+        #       # ...
         #     end
         #   end
         def require_target_property!
           @require_target_property = true
         end
 
-        # Public: Check if the query requires target property.
+        # Check if the query requires target property.
         def require_target_property?
           !!@require_target_property
         end

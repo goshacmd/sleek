@@ -3,23 +3,24 @@ module Sleek
     REGEXP = /(this|previous)_((\d+)_)?(minute|hour|day|week|month)s?/
 
     class << self
-      # Internal: Transform the object passed to Timeframe initializer
+      # Transform the object passed to Timeframe initializer
       # into a range of Time objects.
       #
-      # timeframe - either a Range of Time objects, a two-element array
-      #             of Time Objects, or a special string.
-      # timezone  - the optional String TZ identifier. See
-      #             `ActiveSupport::TimeZone`.
+      # @param timeframe [Range<Time>, Array<Time>, String, Symbol] timeframe description
+      # @param timezone [String] TZ identifier.
       #
-      # Examples
+      # @see ActiveSupport::Timezone
       #
+      # @example range of previous two days
       #   Timeframe.to_range :this_2_days
       #
+      # @example range of previous hour
       #   Timeframe.to_range :previous_hour
       #
+      # @example this day's range in US/Pacific
       #   Timeframe.to_range :this_day, timezone: 'US/Pacific'
       #
-      # Raises ArgumentError if passed object can't be processed.
+      # @raise [ArgumentError] if passed object can't be processed
       def to_range(timeframe, timezone = nil)
         case timeframe
         when proc { |tf| tf.is_a?(Range) && tf.time_range? }
@@ -33,12 +34,12 @@ module Sleek
         end
       end
 
-      # Internal: Process timeframe string to make up a range.
+      # Process timeframe string to make up a range.
       #
-      # timeframe - the String matching
-      #             (this|previous)_((\d+)_)?(minute|hour|day|week|month)s?
-      # timezone  - the optional String TZ identifier. See
-      #             `ActiveSupport::TimeZone`.
+      # @param timeframe [String] matching +(this|previous)_((\d+)_)?(minute|hour|day|week|month)s?+
+      # @param timezone [String] TZ identifier
+      #
+      # @see ActiveSupport::TimeZone
       def parse(timeframe, timezone = nil)
         _, category, _, number, interval = *timeframe.match(REGEXP)
 
@@ -54,16 +55,16 @@ module Sleek
         range
       end
 
-      # Internal: Create a time range from interval type & number of
+      # Create a time range from interval type & number of
       # intervals.
       #
-      # interval - the String interval type name. Valid values are
-      #            minute, hour, day, week, and month.
-      # number   - the Integer number of periods.
-      # timezone  - the optional String TZ identifier. See
-      #             `ActiveSupport::TimeZone`.
+      # @param interval [String] interval type name. Valid values are
+      # +minute+, +hour+, +day+, +week+, and +month+.
       #
-      # Returns the range of TimeWithZone objects.
+      # @param number [Integer] number of periods
+      # @param timezone [String] TZ identifier
+      #
+      # @return [Range<TimeWithZone>]
       def range_from_interval(interval, number = 1, timezone = nil)
         timezone ||= 'UTC'
         now = ActiveSupport::TimeZone.new(timezone).now

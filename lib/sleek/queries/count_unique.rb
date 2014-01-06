@@ -1,13 +1,12 @@
 module Sleek
   module Queries
-    # Internal: Count unique query.
+    # Count unique query.
     #
     # Counts how many events have unique value for a given property.
     #
-    # target_property - the String name of target property on event.
+    # @param target_property [String] name of target property on event
     #
-    # Examples
-    #
+    # @example
     #   sleek.queries.count_unique(:purchases, target_property: "customer.email")
     #   # => 4
     class CountUnique < Query

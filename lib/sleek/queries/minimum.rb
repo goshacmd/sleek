@@ -1,13 +1,12 @@
 module Sleek
   module Queries
-    # Internal: Minimum query.
+    # Minimum query.
     #
     # Finds the minimum value for a given property.
     #
-    # target_property - the String name of target property on event.
+    # @param target_property [String] name of target property on event
     #
-    # Examples
-    #
+    # @example
     #   sleek.queries.minimum(:purchases, target_property: "total")
     #   # => 19_99
     class Minimum < Query

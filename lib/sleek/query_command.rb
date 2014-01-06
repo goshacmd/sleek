@@ -1,25 +1,27 @@
 module Sleek
-  # Internal: A query command. It's primarily responsible for breaking a
+  # A query command. It's primarily responsible for breaking a
   # timeframe into intervals (if applicable), running the query on each
   # sub-timeframe, and wrapping up a result.
   class QueryCommand
     attr_reader :klass, :namespace, :bucket, :options
 
-    # Internal: Initialize the query command.
+    # Initialize a new +QueryCommand+.
     #
-    # klass     - the Sleek::Queries::Query subclass.
-    # namespace - the Sleek::Namespace object.
-    # bucket    - the String bucket name.
-    # options   - the optional Hash of options. Everything but
-    #             :timeframe and :interval will be passed on to the
-    #             query class.
-    #             :timeframe - the optional timeframe description.
-    #             :timezone  - the optional TZ identifier.
-    #             :interval  - the optional interval description. If
-    #                          passed, requires that :timeframe is passed
-    #                          as well.
+    # @param klass [Queries::Query]
+    # @param namespace [Namespace]
+    # @param bucket [String] bucket name
+    # @param options [Hash] options. Everything but +:timeframe+ and +:interval+
+    # is passed on to the query class
     #
-    # Raises ArgumentError if :interval is passed but :timeframe is not.
+    # @option options [String, Symbol, Range, Array] :timeframe timeframe description
+    # @option options [String] :timezone TZ identifier
+    # @option options [Symbol] :interval interval description.
+    # Optional. If passed, requires that +:timeframe+ is passed as well
+    #
+    # @see Interval#initialize
+    # @see Timeframe.parse
+    #
+    # @raise ArgumentError if +:interval+ is passed but +:timeframe+ is not
     def initialize(klass, namespace, bucket, options = {})
       @klass = klass
       @namespace = namespace
@@ -34,30 +36,38 @@ module Sleek
       end
     end
 
-    # Internal: Check if options include interval.
+    # Check if options include interval.
     def series?
       @interval.present?
     end
 
-    # Internal: Parse a time range from the timeframe description.
+    # Parse a time range from the timeframe description.
     # description.
+    #
+    # @return [Timeframe]
     def timeframe
       Sleek::Timeframe.to_range(@timeframe, @timezone) if @timeframe
     end
 
-    # Internal: Split timeframe into sub-timeframes of interval.
+    # Split timeframe into sub-timeframes of interval.
+    #
+    # @return [Array<Range<Time>>]
     def series
       Sleek::Interval.new(@interval, timeframe).timeframes
     end
 
-    # Internal: Instantiate a query object.
+    # Instantiate a query object.
     #
-    # timeframe - the time range.
+    # @param timeframe [String, Symbol, Range, Array] timeframe description
+    #
+    # @see Timeframe.parse
     def new_query(timeframe)
       klass.new(namespace, bucket, options.merge(timeframe: timeframe))
     end
 
-    # Internal: Run the query on each timeframe.
+    # Run the query on each timeframe.
+    #
+    # @return [Array<Hash>]
     def run
       if series?
         series.map do |tf|

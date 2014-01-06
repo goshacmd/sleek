@@ -1,12 +1,12 @@
 module Sleek
   class QueryCollection
     class << self
-      # Public: Register a query.
+      # Register a query.
       #
-      # name    - the Symbol query name.
-      # klass   - the query class.
-      # options - the options hash:
-      #           :alias - the Symbol alias name.
+      # @param name [Symbol] query name
+      # @param klass [Class] query class
+      # @param options [Hash] options hash
+      # @option options [Symbol] :alias alias name
       def register(name, klass, options = {})
         @registry ||= {}
         @aliases  ||= {}
@@ -17,17 +17,20 @@ module Sleek
         define_query_method(name)
       end
 
-      # Public: Define an alias for query name.
+      # Define an alias for query name.
       #
-      # query_name - the Symbol query name.
-      # alias_name - the Symbol alias name.
+      # @param query_name [Symbol] query name
+      # @param alias_name [Symbol] alias name
       def alias_query(query_name, alias_name)
         @aliases ||= {}
         @aliases[alias_name] = query_name
         define_query_method(query_name, alias_name)
       end
 
-      # Internal: Define a query method on collection.
+      # Define a query method on collection.
+      #
+      # @param name [Symbol]
+      # @param method_name [Symbol]
       def define_query_method(name, method_name = name)
         klass = @registry[name]
 
@@ -39,9 +42,9 @@ module Sleek
 
     attr_reader :namespace
 
-    # Inernal: Initialize query collection.
+    # Initialize a new +QueryCollection+.
     #
-    # namespace - the Sleek::Namespace object.
+    # @param namespace [Namespace]
     def initialize(namespace)
       @namespace = namespace
     end

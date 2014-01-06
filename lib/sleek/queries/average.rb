@@ -1,13 +1,12 @@
 module Sleek
   module Queries
-    # Internal: Average query.
+    # Average query.
     #
     # Finds the average value for a given property.
     #
-    # target_property - the String name of target property on event.
+    # @param target_property [String] name of target property on event
     #
-    # Examples
-    #
+    # @example
     #   sleek.queries.average(:purchases, target_property: "total")
     #   # => 49_35
     class Average < Query

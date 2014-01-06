@@ -2,48 +2,52 @@ module Sleek
   class Namespace
     attr_reader :name
 
-    # Internal: Initialize Sleek with namespace.
+    # Initialize a new +Namespace+.
     #
-    # namespace - the Symbol namespace name.
+    # @params name [Symbol] namespace name
     def initialize(name)
       @name = name
     end
 
-    # Public: Record an event.
+    # Record an event.
     #
-    # bucket  - the String name of bucket.
-    # payload - the Hash of event data.
+    # @param bucket [String] bucket name
+    # @param payload [Hash] event data
     def record(bucket, payload)
       Event.create_with_namespace(name, bucket, payload)
     end
 
-    # Public: Get `QueriesCollection` for the namespace.
+    # Get +QueriesCollection+ for the namespace.
+    #
+    # @return [QueriesCollection]
     def queries
       @queries ||= QueryCollection.new(self)
     end
 
-    # Public: Delete the namespace.
+    # Delete the namespace.
     def delete!
       events.delete_all
     end
 
-    # Public: Delete event bucket.
+    # Delete event bucket.
     #
-    # bucket - the String bucket name.
+    # @param bucket [String] bucket name
     def delete_bucket(bucket)
       events(bucket).delete_all
     end
 
-    # Public: Delete specific property from all events in the bucket.
+    # Delete specific property from all events in the bucket.
     #
-    # bucket   - the String bucket name.
-    # property - the String property name.
+    # @param bucket [String] bucket name
+    # @param property [String] property name
     def delete_property(bucket, property)
       events(bucket).unset("d.#{property}")
     end
 
-    # Internal: Get events associated with current namespace and,
+    # Get events associated with current namespace and,
     # optionally, specified bucket.
+    #
+    # @param bucket [String, nil] bucket name
     def events(bucket = nil)
       evts = Event.where(namespace: name)
       evts = evts.where(bucket: bucket) if bucket.present?

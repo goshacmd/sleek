@@ -15,11 +15,15 @@ require 'sleek/queries'
 require 'sleek/namespace'
 
 module Sleek
-  def self.for_namespace(namespace)
-    Namespace.new namespace
-  end
-
-  def self.[](namespace)
-    for_namespace(namespace)
+  class << self
+    # Create a namespace with name +namespace+.
+    #
+    # @param namespace [String]
+    #
+    # @return [Namespace]
+    def for_namespace(namespace)
+      Namespace.new namespace
+    end
+    alias_method :[], :for_namespace
   end
 end

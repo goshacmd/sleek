@@ -1,4 +1,5 @@
 module Sleek
+  # Metadata of event.
   class EventMetadata
     include Mongoid::Document
     include Mongoid::Timestamps::Created::Short
@@ -13,6 +14,7 @@ module Sleek
     end
   end
 
+  # Event model.
   class Event
     include Mongoid::Document
 
